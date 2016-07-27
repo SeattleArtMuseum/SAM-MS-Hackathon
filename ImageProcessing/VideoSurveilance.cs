@@ -101,11 +101,17 @@ namespace VideoSurveilance
 
         TableStorageClient tableClient;
 
+        bool DEBUG = false;
+
         public VideoSurveilance()
         {
             tableClient = new TableStorageClient(Constants.StorageConnectionString);
             thresholds = new List<Tuple<string, Point, Point>>();
             InitializeComponent();
+            if (!DEBUG)
+            {
+                imageBox2.Hide();
+            }
         }
 
         int thresholdindex = 0;
@@ -121,6 +127,7 @@ namespace VideoSurveilance
 
             if(thresholdindex < thresholds.Count())
             {
+                imageBox1.Hide();
                 LoadVideoFile(thresholds[thresholdindex].Item1);
                 LeftCoordinate = thresholds[thresholdindex].Item2;
                 RightCoordinate = thresholds[thresholdindex].Item3;
@@ -234,6 +241,8 @@ namespace VideoSurveilance
 
         void ProcessFrame(object sender, EventArgs e)
         {
+
+            label8.Text = "Processing: " + thresholds[thresholdindex - 1].Item1 + " Frame: " + currentFrame;
             textBox1.Text = Math.Round(CurrentTime() % 60).ToString();
             this.currentFrame++;
             Mat frame = _cameraCapture.QueryFrame();
@@ -292,8 +301,11 @@ namespace VideoSurveilance
             }
 
             DrawBlobs(frame);
-            imageBox1.Image = frame;
-            imageBox2.Image = foregroundMask;
+            if (DEBUG)
+            {
+                imageBox1.Image = frame;
+                imageBox2.Image = foregroundMask;
+            }
         }
 
         private void UpdateBlobs(Mat frame)
