@@ -34,6 +34,11 @@ namespace VideoSurveilance
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.imageBox1 = new Emgu.CV.UI.ImageBox();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.eventEndDate = new System.Windows.Forms.DateTimePicker();
+            this.label7 = new System.Windows.Forms.Label();
+            this.eventStartDate = new System.Windows.Forms.DateTimePicker();
+            this.label6 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
             this.eventName2 = new System.Windows.Forms.TextBox();
             this.eventName = new System.Windows.Forms.Label();
             this.browse = new System.Windows.Forms.Button();
@@ -79,7 +84,6 @@ namespace VideoSurveilance
             this.label3 = new System.Windows.Forms.Label();
             this.txtId = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -144,9 +148,9 @@ namespace VideoSurveilance
             // imageBox1
             // 
             this.imageBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.imageBox1.Location = new System.Drawing.Point(0, 167);
+            this.imageBox1.Location = new System.Drawing.Point(0, 206);
             this.imageBox1.Name = "imageBox1";
-            this.imageBox1.Size = new System.Drawing.Size(551, 385);
+            this.imageBox1.Size = new System.Drawing.Size(551, 346);
             this.imageBox1.TabIndex = 2;
             this.imageBox1.TabStop = false;
             this.imageBox1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.imageBox1_MouseClick);
@@ -154,6 +158,10 @@ namespace VideoSurveilance
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.eventEndDate);
+            this.panel1.Controls.Add(this.label7);
+            this.panel1.Controls.Add(this.eventStartDate);
+            this.panel1.Controls.Add(this.label6);
             this.panel1.Controls.Add(this.label4);
             this.panel1.Controls.Add(this.eventName2);
             this.panel1.Controls.Add(this.eventName);
@@ -164,8 +172,49 @@ namespace VideoSurveilance
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(551, 167);
+            this.panel1.Size = new System.Drawing.Size(551, 206);
             this.panel1.TabIndex = 0;
+            // 
+            // eventEndDate
+            // 
+            this.eventEndDate.Location = new System.Drawing.Point(117, 124);
+            this.eventEndDate.Name = "eventEndDate";
+            this.eventEndDate.Size = new System.Drawing.Size(184, 20);
+            this.eventEndDate.TabIndex = 31;
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(11, 128);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(95, 13);
+            this.label7.TabIndex = 30;
+            this.label7.Text = "4) Event End Date";
+            // 
+            // eventStartDate
+            // 
+            this.eventStartDate.Location = new System.Drawing.Point(118, 93);
+            this.eventStartDate.Name = "eventStartDate";
+            this.eventStartDate.Size = new System.Drawing.Size(184, 20);
+            this.eventStartDate.TabIndex = 29;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(12, 97);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(98, 13);
+            this.label6.TabIndex = 28;
+            this.label6.Text = "3) Event Start Date";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(12, 163);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(97, 13);
+            this.label4.TabIndex = 27;
+            this.label4.Text = "5) Annotate Videos";
             // 
             // eventName2
             // 
@@ -201,7 +250,7 @@ namespace VideoSurveilance
             // 
             // cmdStartVideo
             // 
-            this.cmdStartVideo.Location = new System.Drawing.Point(118, 97);
+            this.cmdStartVideo.Location = new System.Drawing.Point(118, 154);
             this.cmdStartVideo.Name = "cmdStartVideo";
             this.cmdStartVideo.Size = new System.Drawing.Size(82, 30);
             this.cmdStartVideo.TabIndex = 8;
@@ -620,15 +669,6 @@ namespace VideoSurveilance
             this.label2.Text = "Forground Mask";
             this.label2.Visible = false;
             // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(12, 106);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(97, 13);
-            this.label4.TabIndex = 27;
-            this.label4.Text = "3) Annotate Videos";
-            // 
             // VideoSurveilance
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -703,5 +743,9 @@ namespace VideoSurveilance
         private TextBox eventName2;
         private Label eventName;
         private Label label4;
+        private Label label6;
+        private DateTimePicker eventEndDate;
+        private Label label7;
+        private DateTimePicker eventStartDate;
     }
 }

@@ -639,6 +639,9 @@ namespace VideoSurveilance
                 this.resetButton.Hide();
 
                 eventTable = new EventTable(Guid.NewGuid(), this.eventName2.Text);
+                eventTable.EventStartDate = this.eventStartDate.Value.ToString();
+                eventTable.EventEndDate = this.eventEndDate.Value.ToString();
+
                 tableClient.InsertRecord("Event", eventTable);
 
                 Run();
