@@ -86,6 +86,9 @@ namespace VideoSurveilance
             this.label3 = new System.Windows.Forms.Label();
             this.txtId = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
+            this.animation = new System.Windows.Forms.PictureBox();
+            this.cmdPlayVideoFromOutput = new System.Windows.Forms.Button();
+            this.lstVideoOutput = new System.Windows.Forms.ListBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -94,6 +97,7 @@ namespace VideoSurveilance
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox2)).BeginInit();
             this.panel2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.animation)).BeginInit();
             this.SuspendLayout();
             // 
             // splitContainer1
@@ -104,6 +108,9 @@ namespace VideoSurveilance
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.Controls.Add(this.cmdPlayVideoFromOutput);
+            this.splitContainer1.Panel1.Controls.Add(this.lstVideoOutput);
+            this.splitContainer1.Panel1.Controls.Add(this.animation);
             this.splitContainer1.Panel1.Controls.Add(this.imageBox1);
             this.splitContainer1.Panel1.Controls.Add(this.panel1);
             // 
@@ -694,6 +701,37 @@ namespace VideoSurveilance
             this.label2.Text = "Forground Mask";
             this.label2.Visible = false;
             // 
+            // animation
+            // 
+            this.animation.Location = new System.Drawing.Point(12, 216);
+            this.animation.Name = "animation";
+            this.animation.Size = new System.Drawing.Size(263, 214);
+            this.animation.TabIndex = 33;
+            this.animation.TabStop = false;
+            this.animation.Visible = false;
+            // 
+            // cmdPlayVideoFromOutput
+            // 
+            this.cmdPlayVideoFromOutput.Location = new System.Drawing.Point(467, 507);
+            this.cmdPlayVideoFromOutput.Name = "cmdPlayVideoFromOutput";
+            this.cmdPlayVideoFromOutput.Size = new System.Drawing.Size(78, 30);
+            this.cmdPlayVideoFromOutput.TabIndex = 39;
+            this.cmdPlayVideoFromOutput.Text = "Play Video";
+            this.cmdPlayVideoFromOutput.UseVisualStyleBackColor = true;
+            this.cmdPlayVideoFromOutput.Visible = false;
+            this.cmdPlayVideoFromOutput.Click += new System.EventHandler(this.cmdPlayVideoFromOutput_Click_1);
+            // 
+            // lstVideoOutput
+            // 
+            this.lstVideoOutput.FormattingEnabled = true;
+            this.lstVideoOutput.Location = new System.Drawing.Point(0, 445);
+            this.lstVideoOutput.Name = "lstVideoOutput";
+            this.lstVideoOutput.ScrollAlwaysVisible = true;
+            this.lstVideoOutput.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
+            this.lstVideoOutput.Size = new System.Drawing.Size(545, 56);
+            this.lstVideoOutput.TabIndex = 38;
+            this.lstVideoOutput.Visible = false;
+            // 
             // VideoSurveilance
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -713,6 +751,7 @@ namespace VideoSurveilance
             ((System.ComponentModel.ISupportInitialize)(this.imageBox2)).EndInit();
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.animation)).EndInit();
             this.ResumeLayout(false);
 
       }
@@ -774,5 +813,8 @@ namespace VideoSurveilance
         private DateTimePicker eventStartDate;
         private Label label8;
         private Button SkipButton;
+        private PictureBox animation;
+        private ListBox lstVideoOutput;
+        private Button cmdPlayVideoFromOutput;
     }
 }
