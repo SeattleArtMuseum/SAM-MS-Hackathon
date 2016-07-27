@@ -512,7 +512,7 @@ namespace VideoSurveilance
 
         private double CountPeople(double averagesize)
         {
-            return Math.Sqrt(averagesize) / 1000 + averagesize / 8000;//result of basic ml
+            return Math.Sqrt(averagesize) / 700 + averagesize / 5000;//result of basic ml
         }
 
         private MovingBlob CreateMovingBlob(CvTrack blob, int currentFrame, bool updateMap = false)
