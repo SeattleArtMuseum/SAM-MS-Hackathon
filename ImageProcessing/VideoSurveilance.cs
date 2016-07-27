@@ -108,33 +108,43 @@ namespace VideoSurveilance
             InitializeComponent();
         }
 
+        int thresholdindex = 0;
         void Run()
         {
             _fgDetector = new BackgroundSubtractorMOG2(history: 1000, varThreshold: 64, shadowDetection: true);
             _blobDetector = new CvBlobDetector();
             _tracker = new CvTracks();
+            currentFrame = 0;
+            retiredblobs = new List<MovingBlob>();
+            movingblobs = new Dictionary<int, MovingBlob>();
+            blobMap = new Dictionary<int, int>();
 
-            Application.Idle += ProcessFrame;
+            if(thresholdindex < thresholds.Count())
+            {
+                LoadVideoFile(thresholds[thresholdindex].Item1);
+                LeftCoordinate = thresholds[thresholdindex].Item2;
+                RightCoordinate = thresholds[thresholdindex].Item3;
+                Application.Idle += ProcessFrame;
+                thresholdindex++;
+            }
         }
 
-        public void LoadVideo()
+        /// <summary>
+        /// Load a video with the given filename
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <returns>Whether the load was successful</returns>
+        public static bool LoadVideoFile(string filename)
         {
             try
             {
-                //if (File.Exists(@"C:\Users\David_2\Pictures\SculptureParkCamera5.asf"))
-                if (File.Exists(this.FileLocation) && !String.IsNullOrWhiteSpace(this.eventName2.Text))
-                {
-                    _cameraCapture = new Capture(this.FileLocation);
-                }
-                else
-                {
-                    MessageBox.Show("Please select a video and enter an event name");
-                }
+                _cameraCapture = new Capture(filename);
+                return true;
             }
             catch (Exception e)
             {
-                MessageBox.Show(e.Message);
-                return;
+                MessageBox.Show("Unable to load video: " + filename + " (" + e.Message + ")");
+                return false;
             }
         }
 
@@ -143,7 +153,7 @@ namespace VideoSurveilance
         /// </summary>
         /// <param name="thresholds">A list of thresholds: the filename, the left point, the right point</param>
         /// <param name="filename">If you want to override</param>
-        /// <returns></returns>
+        /// <returns>Whether saving was successful</returns>
         public bool SaveThresholdsToFile(List<Tuple<string, Point, Point>> thresholds, string filename = null)
         {
             filename = filename == null ? THRESHOLD_PATH : filename;
@@ -163,7 +173,7 @@ namespace VideoSurveilance
                 }
                 return true;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 MessageBox.Show("Error saving thresholds: " + e.Message);
                 return false;
@@ -175,7 +185,7 @@ namespace VideoSurveilance
         /// </summary>
         /// <param name="filename">If you want to override</param>
         /// <returns>A list of thresholds: the filename, the left point, the right point</returns>
-        public List<Tuple<string, Point, Point>> LoadThresholdsFromFile(string filename =null)
+        public List<Tuple<string, Point, Point>> LoadThresholdsFromFile(string filename = null)
         {
             filename = filename == null ? THRESHOLD_PATH : filename;
 
@@ -190,7 +200,7 @@ namespace VideoSurveilance
                 using (var reader = new StreamReader(filename))
                 {
                     var line = reader.ReadLine();
-                    while(line != null)
+                    while (line != null)
                     {
                         var split = line.Split(',');
                         if (split.Count() != 5)
@@ -229,7 +239,9 @@ namespace VideoSurveilance
             Mat frame = _cameraCapture.QueryFrame();
             if (frame == null || (stopAtFrame.HasValue && this.currentFrame == stopAtFrame.Value))
             {
+                Application.Idle -= ProcessFrame;
                 OutputResults();
+                Run();
                 return;
             }
 
@@ -280,7 +292,6 @@ namespace VideoSurveilance
             }
 
             DrawBlobs(frame);
-            currentFrame++;
             imageBox1.Image = frame;
             imageBox2.Image = foregroundMask;
         }
@@ -375,7 +386,7 @@ namespace VideoSurveilance
                     if (ageWidth > 0)
                     {
                         var crossedTime = movingblob.Value.CrossedTime(LeftCoordinate.Value, RightCoordinate.Value);
-                        if(crossedTime > 0 && movingblob.Value.Path[i].Item2 > crossedTime)
+                        if (crossedTime > 0 && movingblob.Value.Path[i].Item2 > crossedTime)
                         {
                             CvInvoke.Line(frame, movingblob.Value.Path[i].Item1, movingblob.Value.Path[i + 1].Item1, new MCvScalar(255.0, 255.0, 0.0), ageWidth);
                         }
@@ -607,15 +618,17 @@ namespace VideoSurveilance
             }
 
             // Get all files in directory
-            string[] files = Directory.GetFiles(this.FileDirectoryLocation);
+            string[] allfiles = Directory.GetFiles(this.FileDirectoryLocation);
 
-            if (this.FilesAnnotated < files.Length)
+            var videofiles = allfiles.ToList().Where(s => (s.EndsWith(".mp4") || s.EndsWith(".asf"))).ToList();
+
+            if (this.FilesAnnotated < videofiles.Count())
             {
-                this.FileLocation = files[this.FilesAnnotated];
+                this.FileLocation = videofiles[this.FilesAnnotated];
 
                 this.resetButton_Click(sender, e);
 
-                _cameraCapture = new Capture(files[this.FilesAnnotated]);
+                _cameraCapture = new Capture(videofiles[this.FilesAnnotated]);
                 Mat frame1 = _cameraCapture.QueryFrame();
                 // Advance to 5th frame
                 for (int k = 0; k < 5; k++)
@@ -1109,7 +1122,7 @@ namespace VideoSurveilance
 
         private void cmdSkipToFrame_Click(object sender, EventArgs e)
         {
-            this.LoadVideo();
+            //this.LoadVideo();
             int frameSkip = Int32.Parse(this.txtSkipToFrame.Text);
             for (int i = 0; i < frameSkip; i++)
             {
@@ -1288,9 +1301,9 @@ namespace VideoSurveilance
             {
                 return -1;
             }
-            for(var i = 0; i < Path.Count - 2; i++)
+            for (var i = 0; i < Path.Count - 2; i++)
             {
-                if(crossedThreshold(leftCoordinate, rightCoordinate, Path[i].Item1, Path[i + 1].Item1))
+                if (crossedThreshold(leftCoordinate, rightCoordinate, Path[i].Item1, Path[i + 1].Item1))
                 {
                     return Path[i + 1].Item2;
                 }
