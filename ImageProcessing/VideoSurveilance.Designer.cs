@@ -85,6 +85,7 @@ namespace VideoSurveilance
             this.txtId = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
+            this.SkipButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -109,6 +110,7 @@ namespace VideoSurveilance
             // 
             // splitContainer1.Panel2
             // 
+            this.splitContainer1.Panel2.Controls.Add(this.SkipButton);
             this.splitContainer1.Panel2.Controls.Add(this.cmdStopFrame);
             this.splitContainer1.Panel2.Controls.Add(this.txtStopFrame);
             this.splitContainer1.Panel2.Controls.Add(this.cmdCompare);
@@ -734,6 +736,18 @@ namespace VideoSurveilance
             this.label8.Size = new System.Drawing.Size(0, 20);
             this.label8.TabIndex = 32;
             // 
+            // SkipButton
+            // 
+            this.SkipButton.Location = new System.Drawing.Point(335, 257);
+            this.SkipButton.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.SkipButton.Name = "SkipButton";
+            this.SkipButton.Size = new System.Drawing.Size(112, 35);
+            this.SkipButton.TabIndex = 34;
+            this.SkipButton.Text = "Skip";
+            this.SkipButton.UseVisualStyleBackColor = true;
+            this.SkipButton.Visible = false;
+            this.SkipButton.Click += new System.EventHandler(this.button1_Click);
+            // 
             // VideoSurveilance
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
@@ -814,5 +828,6 @@ namespace VideoSurveilance
         private Label label7;
         private DateTimePicker eventStartDate;
         private Label label8;
+        private Button SkipButton;
     }
 }

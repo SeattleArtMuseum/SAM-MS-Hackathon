@@ -488,6 +488,7 @@ namespace VideoSurveilance
                 if (thresholdindex == thresholds.Count())
                 {
                     MessageBox.Show("All files processed");
+                    Application.Exit();
                 }
             }
 
@@ -620,6 +621,7 @@ namespace VideoSurveilance
                 MessageBox.Show("Please select a file and enter an event name first");
                 return;
             }
+            SkipButton.Show();
 
             // Get all files in directory
             string[] allfiles = Directory.GetFiles(this.FileDirectoryLocation);
@@ -662,6 +664,7 @@ namespace VideoSurveilance
 
                 tableClient.InsertRecord("Event", eventTable);
 
+                SkipButton.Hide();
                 label8.Text = "";
                 Run();
             }
@@ -1148,6 +1151,11 @@ namespace VideoSurveilance
             {
                 this.stopAtFrame = Int32.Parse(this.txtStopFrame.Text);
             }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            cmdStartVideo_Click(sender, e);
         }
     }
 
