@@ -8,7 +8,7 @@ namespace StorageClient
         public ActionTable(string eventId, DateTime timeStamp)
         {
             this.PartitionKey = eventId.ToString();
-            this.RowKey = timeStamp.ToLongDateString();
+            this.RowKey = timeStamp.ToString("f");
         }
 
         public ActionTable() { }

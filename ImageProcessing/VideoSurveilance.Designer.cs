@@ -34,12 +34,19 @@ namespace VideoSurveilance
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.imageBox1 = new Emgu.CV.UI.ImageBox();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.label4 = new System.Windows.Forms.Label();
+            this.eventName2 = new System.Windows.Forms.TextBox();
+            this.eventName = new System.Windows.Forms.Label();
             this.browse = new System.Windows.Forms.Button();
             this.fileNameTextBox = new System.Windows.Forms.TextBox();
-            this.cmdCompare = new System.Windows.Forms.Button();
             this.cmdStartVideo = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
+            this.cmdStopFrame = new System.Windows.Forms.Button();
+            this.txtStopFrame = new System.Windows.Forms.TextBox();
+            this.cmdCompare = new System.Windows.Forms.Button();
+            this.label5 = new System.Windows.Forms.Label();
+            this.cmdSkipToFrame = new System.Windows.Forms.Button();
+            this.txtSkipToFrame = new System.Windows.Forms.TextBox();
+            this.lblSkipToFrame = new System.Windows.Forms.Label();
             this.resetButton = new System.Windows.Forms.Button();
             this.continueButton = new System.Windows.Forms.Button();
             this.messaging = new System.Windows.Forms.TextBox();
@@ -72,7 +79,6 @@ namespace VideoSurveilance
             this.label3 = new System.Windows.Forms.Label();
             this.txtId = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.eventName = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -96,6 +102,13 @@ namespace VideoSurveilance
             // 
             // splitContainer1.Panel2
             // 
+            this.splitContainer1.Panel2.Controls.Add(this.cmdStopFrame);
+            this.splitContainer1.Panel2.Controls.Add(this.txtStopFrame);
+            this.splitContainer1.Panel2.Controls.Add(this.cmdCompare);
+            this.splitContainer1.Panel2.Controls.Add(this.label5);
+            this.splitContainer1.Panel2.Controls.Add(this.cmdSkipToFrame);
+            this.splitContainer1.Panel2.Controls.Add(this.txtSkipToFrame);
+            this.splitContainer1.Panel2.Controls.Add(this.lblSkipToFrame);
             this.splitContainer1.Panel2.Controls.Add(this.resetButton);
             this.splitContainer1.Panel2.Controls.Add(this.continueButton);
             this.splitContainer1.Panel2.Controls.Add(this.messaging);
@@ -123,16 +136,16 @@ namespace VideoSurveilance
             this.splitContainer1.Panel2.Controls.Add(this.textBox1);
             this.splitContainer1.Panel2.Controls.Add(this.imageBox2);
             this.splitContainer1.Panel2.Controls.Add(this.panel2);
-            this.splitContainer1.Size = new System.Drawing.Size(1120, 532);
+            this.splitContainer1.Size = new System.Drawing.Size(1120, 552);
             this.splitContainer1.SplitterDistance = 551;
             this.splitContainer1.TabIndex = 0;
             // 
             // imageBox1
             // 
             this.imageBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.imageBox1.Location = new System.Drawing.Point(0, 92);
+            this.imageBox1.Location = new System.Drawing.Point(0, 103);
             this.imageBox1.Name = "imageBox1";
-            this.imageBox1.Size = new System.Drawing.Size(551, 440);
+            this.imageBox1.Size = new System.Drawing.Size(551, 449);
             this.imageBox1.TabIndex = 2;
             this.imageBox1.TabStop = false;
             this.imageBox1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.imageBox1_MouseClick);
@@ -140,27 +153,33 @@ namespace VideoSurveilance
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.eventName2);
             this.panel1.Controls.Add(this.eventName);
-            this.panel1.Controls.Add(this.label4);
             this.panel1.Controls.Add(this.browse);
             this.panel1.Controls.Add(this.fileNameTextBox);
-            this.panel1.Controls.Add(this.cmdCompare);
             this.panel1.Controls.Add(this.cmdStartVideo);
             this.panel1.Controls.Add(this.label1);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(551, 92);
+            this.panel1.Size = new System.Drawing.Size(551, 103);
             this.panel1.TabIndex = 0;
             // 
-            // label4
+            // eventName2
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(167, 61);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(66, 13);
-            this.label4.TabIndex = 25;
-            this.label4.Text = "Event Name";
+            this.eventName2.Location = new System.Drawing.Point(93, 58);
+            this.eventName2.Name = "eventName2";
+            this.eventName2.Size = new System.Drawing.Size(149, 20);
+            this.eventName2.TabIndex = 26;
+            // 
+            // eventName
+            // 
+            this.eventName.AutoSize = true;
+            this.eventName.Location = new System.Drawing.Point(12, 59);
+            this.eventName.Name = "eventName";
+            this.eventName.Size = new System.Drawing.Size(66, 13);
+            this.eventName.TabIndex = 25;
+            this.eventName.Text = "Event Name";
             // 
             // browse
             // 
@@ -178,19 +197,9 @@ namespace VideoSurveilance
             this.fileNameTextBox.Size = new System.Drawing.Size(149, 20);
             this.fileNameTextBox.TabIndex = 24;
             // 
-            // cmdCompare
-            // 
-            this.cmdCompare.Location = new System.Drawing.Point(432, 8);
-            this.cmdCompare.Name = "cmdCompare";
-            this.cmdCompare.Size = new System.Drawing.Size(109, 30);
-            this.cmdCompare.TabIndex = 9;
-            this.cmdCompare.Text = "Compare Results";
-            this.cmdCompare.UseVisualStyleBackColor = true;
-            this.cmdCompare.Click += new System.EventHandler(this.cmdCompare_Click);
-            // 
             // cmdStartVideo
             // 
-            this.cmdStartVideo.Location = new System.Drawing.Point(344, 8);
+            this.cmdStartVideo.Location = new System.Drawing.Point(374, 59);
             this.cmdStartVideo.Name = "cmdStartVideo";
             this.cmdStartVideo.Size = new System.Drawing.Size(82, 30);
             this.cmdStartVideo.TabIndex = 8;
@@ -203,13 +212,78 @@ namespace VideoSurveilance
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(12, 13);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(75, 13);
+            this.label1.Size = new System.Drawing.Size(53, 13);
             this.label1.TabIndex = 0;
-            this.label1.Text = "Camera Frame";
+            this.label1.Text = "Video File";
+            // 
+            // cmdStopFrame
+            // 
+            this.cmdStopFrame.Location = new System.Drawing.Point(505, 111);
+            this.cmdStopFrame.Name = "cmdStopFrame";
+            this.cmdStopFrame.Size = new System.Drawing.Size(54, 30);
+            this.cmdStopFrame.TabIndex = 33;
+            this.cmdStopFrame.Text = "Ok";
+            this.cmdStopFrame.UseVisualStyleBackColor = true;
+            this.cmdStopFrame.Click += new System.EventHandler(this.cmdStopFrame_Click);
+            // 
+            // txtStopFrame
+            // 
+            this.txtStopFrame.Location = new System.Drawing.Point(465, 113);
+            this.txtStopFrame.Name = "txtStopFrame";
+            this.txtStopFrame.Size = new System.Drawing.Size(34, 20);
+            this.txtStopFrame.TabIndex = 32;
+            // 
+            // cmdCompare
+            // 
+            this.cmdCompare.Location = new System.Drawing.Point(453, 400);
+            this.cmdCompare.Name = "cmdCompare";
+            this.cmdCompare.Size = new System.Drawing.Size(109, 30);
+            this.cmdCompare.TabIndex = 9;
+            this.cmdCompare.Text = "Compare Results";
+            this.cmdCompare.UseVisualStyleBackColor = true;
+            this.cmdCompare.Click += new System.EventHandler(this.cmdCompare_Click);
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(387, 118);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(76, 13);
+            this.label5.TabIndex = 31;
+            this.label5.Text = "Stop at Frame:";
+            // 
+            // cmdSkipToFrame
+            // 
+            this.cmdSkipToFrame.Location = new System.Drawing.Point(327, 109);
+            this.cmdSkipToFrame.Name = "cmdSkipToFrame";
+            this.cmdSkipToFrame.Size = new System.Drawing.Size(54, 30);
+            this.cmdSkipToFrame.TabIndex = 30;
+            this.cmdSkipToFrame.Text = "Go";
+            this.cmdSkipToFrame.UseVisualStyleBackColor = true;
+            this.cmdSkipToFrame.Visible = false;
+            this.cmdSkipToFrame.Click += new System.EventHandler(this.cmdSkipToFrame_Click);
+            // 
+            // txtSkipToFrame
+            // 
+            this.txtSkipToFrame.Location = new System.Drawing.Point(287, 115);
+            this.txtSkipToFrame.Name = "txtSkipToFrame";
+            this.txtSkipToFrame.Size = new System.Drawing.Size(34, 20);
+            this.txtSkipToFrame.TabIndex = 29;
+            this.txtSkipToFrame.Visible = false;
+            // 
+            // lblSkipToFrame
+            // 
+            this.lblSkipToFrame.AutoSize = true;
+            this.lblSkipToFrame.Location = new System.Drawing.Point(206, 116);
+            this.lblSkipToFrame.Name = "lblSkipToFrame";
+            this.lblSkipToFrame.Size = new System.Drawing.Size(75, 13);
+            this.lblSkipToFrame.TabIndex = 28;
+            this.lblSkipToFrame.Text = "Skip to Frame:";
+            this.lblSkipToFrame.Visible = false;
             // 
             // resetButton
             // 
-            this.resetButton.Location = new System.Drawing.Point(25, 80);
+            this.resetButton.Location = new System.Drawing.Point(6, 106);
             this.resetButton.Name = "resetButton";
             this.resetButton.Size = new System.Drawing.Size(75, 23);
             this.resetButton.TabIndex = 27;
@@ -220,7 +294,7 @@ namespace VideoSurveilance
             // 
             // continueButton
             // 
-            this.continueButton.Location = new System.Drawing.Point(113, 80);
+            this.continueButton.Location = new System.Drawing.Point(113, 106);
             this.continueButton.Name = "continueButton";
             this.continueButton.Size = new System.Drawing.Size(75, 23);
             this.continueButton.TabIndex = 26;
@@ -242,7 +316,7 @@ namespace VideoSurveilance
             this.chkHuman.AutoSize = true;
             this.chkHuman.Checked = true;
             this.chkHuman.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkHuman.Location = new System.Drawing.Point(357, 173);
+            this.chkHuman.Location = new System.Drawing.Point(445, 225);
             this.chkHuman.Name = "chkHuman";
             this.chkHuman.Size = new System.Drawing.Size(60, 17);
             this.chkHuman.TabIndex = 25;
@@ -255,7 +329,7 @@ namespace VideoSurveilance
             this.chkMachineFilter.AutoSize = true;
             this.chkMachineFilter.Checked = true;
             this.chkMachineFilter.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkMachineFilter.Location = new System.Drawing.Point(284, 173);
+            this.chkMachineFilter.Location = new System.Drawing.Point(381, 225);
             this.chkMachineFilter.Name = "chkMachineFilter";
             this.chkMachineFilter.Size = new System.Drawing.Size(67, 17);
             this.chkMachineFilter.TabIndex = 24;
@@ -265,7 +339,7 @@ namespace VideoSurveilance
             // 
             // cmdCopyItems
             // 
-            this.cmdCopyItems.Location = new System.Drawing.Point(430, 335);
+            this.cmdCopyItems.Location = new System.Drawing.Point(430, 364);
             this.cmdCopyItems.Name = "cmdCopyItems";
             this.cmdCopyItems.Size = new System.Drawing.Size(63, 30);
             this.cmdCopyItems.TabIndex = 23;
@@ -277,7 +351,7 @@ namespace VideoSurveilance
             // lstCompare
             // 
             this.lstCompare.FormattingEnabled = true;
-            this.lstCompare.Location = new System.Drawing.Point(3, 273);
+            this.lstCompare.Location = new System.Drawing.Point(3, 302);
             this.lstCompare.Name = "lstCompare";
             this.lstCompare.ScrollAlwaysVisible = true;
             this.lstCompare.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
@@ -287,7 +361,7 @@ namespace VideoSurveilance
             // 
             // cmdHighlight
             // 
-            this.cmdHighlight.Location = new System.Drawing.Point(499, 335);
+            this.cmdHighlight.Location = new System.Drawing.Point(499, 364);
             this.cmdHighlight.Name = "cmdHighlight";
             this.cmdHighlight.Size = new System.Drawing.Size(63, 30);
             this.cmdHighlight.TabIndex = 21;
@@ -300,7 +374,7 @@ namespace VideoSurveilance
             // 
             this.lblMachineExit.AutoSize = true;
             this.lblMachineExit.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(64)))));
-            this.lblMachineExit.Location = new System.Drawing.Point(98, 344);
+            this.lblMachineExit.Location = new System.Drawing.Point(98, 373);
             this.lblMachineExit.Name = "lblMachineExit";
             this.lblMachineExit.Size = new System.Drawing.Size(69, 13);
             this.lblMachineExit.TabIndex = 20;
@@ -311,7 +385,7 @@ namespace VideoSurveilance
             // 
             this.lblMachineEnter.AutoSize = true;
             this.lblMachineEnter.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(192)))));
-            this.lblMachineEnter.Location = new System.Drawing.Point(98, 367);
+            this.lblMachineEnter.Location = new System.Drawing.Point(98, 396);
             this.lblMachineEnter.Name = "lblMachineEnter";
             this.lblMachineEnter.Size = new System.Drawing.Size(61, 13);
             this.lblMachineEnter.TabIndex = 19;
@@ -322,7 +396,7 @@ namespace VideoSurveilance
             // 
             this.lblHumanExit.AutoSize = true;
             this.lblHumanExit.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
-            this.lblHumanExit.Location = new System.Drawing.Point(3, 344);
+            this.lblHumanExit.Location = new System.Drawing.Point(3, 373);
             this.lblHumanExit.Name = "lblHumanExit";
             this.lblHumanExit.Size = new System.Drawing.Size(76, 13);
             this.lblHumanExit.TabIndex = 18;
@@ -333,7 +407,7 @@ namespace VideoSurveilance
             // 
             this.lblHumanEnter.AutoSize = true;
             this.lblHumanEnter.ForeColor = System.Drawing.Color.Lime;
-            this.lblHumanEnter.Location = new System.Drawing.Point(3, 367);
+            this.lblHumanEnter.Location = new System.Drawing.Point(3, 396);
             this.lblHumanEnter.Name = "lblHumanEnter";
             this.lblHumanEnter.Size = new System.Drawing.Size(68, 13);
             this.lblHumanEnter.TabIndex = 17;
@@ -345,7 +419,7 @@ namespace VideoSurveilance
             this.chkExitFilter.AutoSize = true;
             this.chkExitFilter.Checked = true;
             this.chkExitFilter.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkExitFilter.Location = new System.Drawing.Point(357, 196);
+            this.chkExitFilter.Location = new System.Drawing.Point(332, 225);
             this.chkExitFilter.Name = "chkExitFilter";
             this.chkExitFilter.Size = new System.Drawing.Size(43, 17);
             this.chkExitFilter.TabIndex = 16;
@@ -358,7 +432,7 @@ namespace VideoSurveilance
             this.chkEnterFilter.AutoSize = true;
             this.chkEnterFilter.Checked = true;
             this.chkEnterFilter.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkEnterFilter.Location = new System.Drawing.Point(284, 196);
+            this.chkEnterFilter.Location = new System.Drawing.Point(284, 225);
             this.chkEnterFilter.Name = "chkEnterFilter";
             this.chkEnterFilter.Size = new System.Drawing.Size(51, 17);
             this.chkEnterFilter.TabIndex = 15;
@@ -368,7 +442,7 @@ namespace VideoSurveilance
             // 
             // cmdApplyFrameFilter
             // 
-            this.cmdApplyFrameFilter.Location = new System.Drawing.Point(414, 188);
+            this.cmdApplyFrameFilter.Location = new System.Drawing.Point(505, 213);
             this.cmdApplyFrameFilter.Name = "cmdApplyFrameFilter";
             this.cmdApplyFrameFilter.Size = new System.Drawing.Size(54, 30);
             this.cmdApplyFrameFilter.TabIndex = 14;
@@ -379,7 +453,7 @@ namespace VideoSurveilance
             // 
             // txtMaxFrame
             // 
-            this.txtMaxFrame.Location = new System.Drawing.Point(239, 197);
+            this.txtMaxFrame.Location = new System.Drawing.Point(239, 226);
             this.txtMaxFrame.Name = "txtMaxFrame";
             this.txtMaxFrame.Size = new System.Drawing.Size(29, 20);
             this.txtMaxFrame.TabIndex = 13;
@@ -387,7 +461,7 @@ namespace VideoSurveilance
             // 
             // txtMinFrame
             // 
-            this.txtMinFrame.Location = new System.Drawing.Point(101, 197);
+            this.txtMinFrame.Location = new System.Drawing.Point(101, 226);
             this.txtMinFrame.Name = "txtMinFrame";
             this.txtMinFrame.Size = new System.Drawing.Size(29, 20);
             this.txtMinFrame.TabIndex = 12;
@@ -396,7 +470,7 @@ namespace VideoSurveilance
             // lblMaxFrame
             // 
             this.lblMaxFrame.AutoSize = true;
-            this.lblMaxFrame.Location = new System.Drawing.Point(136, 200);
+            this.lblMaxFrame.Location = new System.Drawing.Point(136, 229);
             this.lblMaxFrame.Name = "lblMaxFrame";
             this.lblMaxFrame.Size = new System.Drawing.Size(100, 13);
             this.lblMaxFrame.TabIndex = 11;
@@ -406,7 +480,7 @@ namespace VideoSurveilance
             // lblMinFrame
             // 
             this.lblMinFrame.AutoSize = true;
-            this.lblMinFrame.Location = new System.Drawing.Point(3, 200);
+            this.lblMinFrame.Location = new System.Drawing.Point(3, 229);
             this.lblMinFrame.Name = "lblMinFrame";
             this.lblMinFrame.Size = new System.Drawing.Size(97, 13);
             this.lblMinFrame.TabIndex = 10;
@@ -415,7 +489,7 @@ namespace VideoSurveilance
             // 
             // txtCompareSummary
             // 
-            this.txtCompareSummary.Location = new System.Drawing.Point(2, 220);
+            this.txtCompareSummary.Location = new System.Drawing.Point(2, 249);
             this.txtCompareSummary.Multiline = true;
             this.txtCompareSummary.Name = "txtCompareSummary";
             this.txtCompareSummary.Size = new System.Drawing.Size(560, 45);
@@ -424,7 +498,7 @@ namespace VideoSurveilance
             // 
             // cmdCopy
             // 
-            this.cmdCopy.Location = new System.Drawing.Point(3, 391);
+            this.cmdCopy.Location = new System.Drawing.Point(3, 420);
             this.cmdCopy.Name = "cmdCopy";
             this.cmdCopy.Size = new System.Drawing.Size(54, 30);
             this.cmdCopy.TabIndex = 8;
@@ -434,7 +508,7 @@ namespace VideoSurveilance
             // 
             // txtTrackOutput
             // 
-            this.txtTrackOutput.Location = new System.Drawing.Point(5, 427);
+            this.txtTrackOutput.Location = new System.Drawing.Point(6, 456);
             this.txtTrackOutput.Multiline = true;
             this.txtTrackOutput.Name = "txtTrackOutput";
             this.txtTrackOutput.Size = new System.Drawing.Size(560, 93);
@@ -442,21 +516,21 @@ namespace VideoSurveilance
             // 
             // txtIdDetails
             // 
-            this.txtIdDetails.Location = new System.Drawing.Point(3, 161);
+            this.txtIdDetails.Location = new System.Drawing.Point(3, 199);
             this.txtIdDetails.Name = "txtIdDetails";
             this.txtIdDetails.Size = new System.Drawing.Size(560, 20);
             this.txtIdDetails.TabIndex = 5;
             // 
             // txtPosition
             // 
-            this.txtPosition.Location = new System.Drawing.Point(3, 135);
+            this.txtPosition.Location = new System.Drawing.Point(3, 173);
             this.txtPosition.Name = "txtPosition";
             this.txtPosition.Size = new System.Drawing.Size(560, 20);
             this.txtPosition.TabIndex = 4;
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(2, 109);
+            this.textBox1.Location = new System.Drawing.Point(3, 147);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(560, 20);
             this.textBox1.TabIndex = 3;
@@ -466,7 +540,7 @@ namespace VideoSurveilance
             this.imageBox2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.imageBox2.Location = new System.Drawing.Point(0, 48);
             this.imageBox2.Name = "imageBox2";
-            this.imageBox2.Size = new System.Drawing.Size(565, 484);
+            this.imageBox2.Size = new System.Drawing.Size(565, 504);
             this.imageBox2.TabIndex = 2;
             this.imageBox2.TabStop = false;
             // 
@@ -528,18 +602,11 @@ namespace VideoSurveilance
             this.label2.TabIndex = 0;
             this.label2.Text = "Forground Mask";
             // 
-            // eventName
-            // 
-            this.eventName.Location = new System.Drawing.Point(240, 61);
-            this.eventName.Name = "eventName";
-            this.eventName.Size = new System.Drawing.Size(301, 20);
-            this.eventName.TabIndex = 26;
-            // 
             // VideoSurveilance
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1120, 532);
+            this.ClientSize = new System.Drawing.Size(1120, 552);
             this.Controls.Add(this.splitContainer1);
             this.Name = "VideoSurveilance";
             this.Text = "VideoSurveilance";
@@ -600,7 +667,13 @@ namespace VideoSurveilance
         private CheckBox chkHuman;
         private CheckBox chkMachineFilter;
         private CheckBox chkOnlyBox;
-        private Label label4;
-        private TextBox eventName;
+        private Button cmdSkipToFrame;
+        private TextBox txtSkipToFrame;
+        private Label lblSkipToFrame;
+        private Button cmdStopFrame;
+        private TextBox txtStopFrame;
+        private Label label5;
+        private TextBox eventName2;
+        private Label eventName;
     }
 }

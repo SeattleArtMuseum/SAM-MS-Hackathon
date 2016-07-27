@@ -22,8 +22,6 @@ namespace VideoSurveilance
 
     public partial class VideoSurveilance : Form
     {
-        public const int MiddleLine = 240;
-
         public static string CSV_PATH = "SAMoutput.csv";
         public static string VerboseCsvPath = "SAMoutput_verbose.csv";
 
@@ -38,8 +36,6 @@ namespace VideoSurveilance
         private string FileLocation;
         private Point? LeftCoordinate = null;
         private Point? RightCoordinate = null;
-
-        private TableStorageClient tableClient;
 
         private bool IsCaptureHeight = false;
 
@@ -65,7 +61,7 @@ namespace VideoSurveilance
         private bool showMachineResults = true;
         private bool showHumanResults = true;
         private List<int> highlightedHumanBlobs = new List<int>();
-        private List<int> highlightedMachineBlobs = new List<int>(); 
+        private List<int> highlightedMachineBlobs = new List<int>();
 
         /// <summary>
         /// Blob id to show detailed information for
@@ -83,12 +79,19 @@ namespace VideoSurveilance
         private int currentFrame = 0;
 
         /// <summary>
+        /// If set, stop processing at this frame index
+        /// </summary>
+        private int? stopAtFrame = null;
+
+        /// <summary>
         /// Used for assigning unique new ids to blobs
         /// </summary>
         private int newIdOffset = 0;
 
         public static Dictionary<int, MovingBlob> movingblobs = new Dictionary<int, MovingBlob>();
         public static List<MovingBlob> retiredblobs = new List<MovingBlob>();
+
+        TableStorageClient tableClient;
 
         public VideoSurveilance()
         {
@@ -98,7 +101,7 @@ namespace VideoSurveilance
 
         void Run()
         {
-            _fgDetector = new BackgroundSubtractorMOG2(history:1000,varThreshold:64, shadowDetection:true);
+            _fgDetector = new BackgroundSubtractorMOG2(history: 1000, varThreshold: 64, shadowDetection: true);
             _blobDetector = new CvBlobDetector();
             _tracker = new CvTracks();
 
@@ -109,20 +112,14 @@ namespace VideoSurveilance
         {
             try
             {
-                if (String.IsNullOrWhiteSpace(this.eventName.Text))
-                {
-                    MessageBox.Show("Please enter an event name.");
-                    return;
-                }
-                
-                 
-               if (File.Exists(this.FileLocation))
+                //if (File.Exists(@"C:\Users\David_2\Pictures\SculptureParkCamera5.asf"))
+                if (File.Exists(this.FileLocation) && !String.IsNullOrWhiteSpace(this.eventName2.Text))
                 {
                     _cameraCapture = new Capture(this.FileLocation);
                 }
                 else
                 {
-                    MessageBox.Show("Please select a video file first.");
+                    MessageBox.Show("Please select a video and enter an event name");
                 }
             }
             catch (Exception e)
@@ -132,11 +129,9 @@ namespace VideoSurveilance
             }
         }
 
-        public static int frameCount = 0;
-
-        public static double CurrentTime()
+        public double CurrentTime()
         {
-            return frameCount / 10.0;
+            return this.currentFrame / 10.0;
         }
 
         private Mat previousframe;
@@ -144,9 +139,9 @@ namespace VideoSurveilance
         void ProcessFrame(object sender, EventArgs e)
         {
             textBox1.Text = Math.Round(CurrentTime() % 60).ToString();
-            frameCount++;
+            this.currentFrame++;
             Mat frame = _cameraCapture.QueryFrame();
-            if (frame == null)// || frameCount == (121 * 10)) // Exit after 121 frames to match verbose output
+            if (frame == null || (stopAtFrame.HasValue && this.currentFrame == stopAtFrame.Value))
             {
                 OutputResults();
                 return;
@@ -262,7 +257,7 @@ namespace VideoSurveilance
 
                     saved.xend = blob.Centroid.X;
                     saved.yend = blob.Centroid.Y;
-                    saved.path.Add(new Tuple<Point, double>(new Point((int)Math.Round(blob.Centroid.X), (int)Math.Round(blob.Centroid.Y)), CurrentTime()));
+                    saved.Path.Add(new Tuple<Point, double>(new Point((int)Math.Round(blob.Centroid.X), (int)Math.Round(blob.Centroid.Y)), CurrentTime()));
                     saved.AddToAverage(blob.BoundingBox.Height * blob.BoundingBox.Width);
                     saved.frames += 1;
                     saved.lastFrame = currentFrame;
@@ -288,29 +283,37 @@ namespace VideoSurveilance
             foreach (var movingblob in movingblobs)
             {
                 // movingblob.Value.CleanPath();
-                for (int i = 0; i < movingblob.Value.path.Count - 1; i++)
+                for (int i = 0; i < movingblob.Value.Path.Count - 1; i++)
                 {
-                    var ageWidth = AgeFade(movingblob.Value.path[i].Item2);
+                    var ageWidth = AgeFade(movingblob.Value.Path[i].Item2);
                     if (ageWidth > 0)
                     {
-                        CvInvoke.Line(frame, movingblob.Value.path[i].Item1, movingblob.Value.path[i + 1].Item1, new MCvScalar(0.0, 255.0, 0.0), ageWidth);
+                        var crossedTime = movingblob.Value.CrossedTime(LeftCoordinate.Value, RightCoordinate.Value);
+                        if(crossedTime > 0 && movingblob.Value.Path[i].Item2 > crossedTime)
+                        {
+                            CvInvoke.Line(frame, movingblob.Value.Path[i].Item1, movingblob.Value.Path[i + 1].Item1, new MCvScalar(255.0, 255.0, 0.0), ageWidth);
+                        }
+                        else
+                        {
+                            CvInvoke.Line(frame, movingblob.Value.Path[i].Item1, movingblob.Value.Path[i + 1].Item1, new MCvScalar(0.0, 255.0, 0.0), ageWidth);
+                        }
                     }
                 }
                 var momentum = movingblob.Value.Momentum();
-                if (movingblob.Value.path.Count > 2)
+                if (movingblob.Value.Path.Count > 2)
                 {
-                    CvInvoke.Line(frame, movingblob.Value.path.Last().Item1, momentum, new MCvScalar(255.0, 0, 255.0), 1);
+                    CvInvoke.Line(frame, movingblob.Value.Path.Last().Item1, momentum, new MCvScalar(255.0, 0, 255.0), 1);
                 }
             }
         }
 
         private void OutputResults()
         {
-            EventTable eventTable = new EventTable(Guid.NewGuid(), "Event Name" + DateTime.Now.Second);
+            EventTable eventTable = new EventTable(Guid.NewGuid(), this.eventName2.Text);
             tableClient.InsertRecord("Event", eventTable);
 
             retiredblobs.AddRange(movingblobs.Values);
-            var validblobs = retiredblobs.Where(b => b.crossedY((Point)this.LeftCoordinate, (Point)this.RightCoordinate) && b.path.Count > Constants.MinPathCountPoints);
+            var validblobs = retiredblobs.Where(b => b.crossedThreshold((Point)this.LeftCoordinate, (Point)this.RightCoordinate) && b.Path.Count > Constants.MinPathCountPoints);
             //!b.IsTooBig());
             if (validblobs.Count() != 0)
             {
@@ -361,9 +364,12 @@ namespace VideoSurveilance
                     foreach (var blob in validblobs)
                     {
                         ActionTable actionTable = new ActionTable(eventTable.PartitionKey, DateTime.Now);
+                        actionTable.CountIn = blob.up ? 1 : 0;
+                        actionTable.CountOut = !blob.up ? 1 : 0;
                         tableClient.InsertRecord("Action", actionTable);
+
                         csv.WriteLine((blob.up ? "Entered," : "Exited,") +
-                            blob.CrossedTime(240) + "," + blob.averagesize);
+                            blob.CrossedTime(LeftCoordinate.Value, RightCoordinate.Value) + "," + blob.averagesize);
                     }
                 }
 
@@ -378,11 +384,11 @@ namespace VideoSurveilance
 
                     if (blob.up)
                     {
-                        CvInvoke.Line(previousframe, blob.path.First().Item1, blob.path.Last().Item1, new MCvScalar(r, g, b), normalSize);
+                        CvInvoke.Line(previousframe, blob.Path.First().Item1, blob.Path.Last().Item1, new MCvScalar(r, g, b), normalSize);
                     }
                     else
                     {
-                        CvInvoke.Line(previousframe, blob.path.First().Item1, blob.path.Last().Item1, new MCvScalar(r, g, b), normalSize);
+                        CvInvoke.Line(previousframe, blob.Path.First().Item1, blob.Path.Last().Item1, new MCvScalar(r, g, b), normalSize);
                     }
                 }
             }
@@ -393,7 +399,7 @@ namespace VideoSurveilance
                 writer.WriteLine("Id,X,Y,Frame,IsUp,AverageSize");
                 foreach (var blob in validblobs)
                 {
-                    foreach (var path in blob.path)
+                    foreach (var path in blob.Path)
                     {
                         writer.WriteLine($"{blob.id},{path.Item1.X},{path.Item1.Y},{path.Item2},{blob.up},{blob.averagesize}");
                     }
@@ -513,9 +519,9 @@ namespace VideoSurveilance
 
         private void cmdStartVideo_Click(object sender, EventArgs e)
         {
-            if (String.IsNullOrWhiteSpace(this.FileLocation) || String.IsNullOrWhiteSpace(this.eventName.Text))
+            if (String.IsNullOrWhiteSpace(this.FileLocation) || String.IsNullOrWhiteSpace(this.eventName2.Text))
             {
-                MessageBox.Show("Please select a file and event name first ");
+                MessageBox.Show("Please select a file and enter an event name first");
                 return;
             }
             LoadVideo();
@@ -566,11 +572,11 @@ namespace VideoSurveilance
                     {
                         if (blob.Path.First().Item1.Y < blob.Path.Last().Item1.Y)
                         {
-                            blob.IsUp = false;
+                            blob.setUp(false);
                         }
                         else
                         {
-                            blob.IsUp = true;
+                            blob.setUp(true);
                         }
                     }
 
@@ -590,7 +596,7 @@ namespace VideoSurveilance
                         {
                             ComparisonBlob blob = new ComparisonBlob();
                             blob.Index = index;
-                            blob.IsUp = isUp;
+                            blob.setUp(isUp);
                             blob.AverageSize = averageSize;
                             machineBlobs.Add(index, blob);
                         }
@@ -640,7 +646,7 @@ namespace VideoSurveilance
                     {
                         int thickness = 2;
                         MCvScalar color = new MCvScalar();
-                        if (blob.IsUp)
+                        if (blob.up)
                         {
                             color = new MCvScalar(255, 0, 0);
                         }
@@ -655,12 +661,12 @@ namespace VideoSurveilance
                             color = new MCvScalar(0, 255, 255);
                         }
 
-                        if (blob.IsUp && !this.showExitingPeople)
+                        if (blob.up && !this.showExitingPeople)
                         {
                             continue;
                         }
 
-                        if (!blob.IsUp && !this.showEnteringPeople)
+                        if (!blob.up && !this.showEnteringPeople)
                         {
                             continue;
                         }
@@ -674,7 +680,7 @@ namespace VideoSurveilance
                             {
                                 if (!added)
                                 {
-                                    if (blob.IsUp)
+                                    if (blob.up)
                                     {
                                         humanExit++;
                                     }
@@ -684,7 +690,7 @@ namespace VideoSurveilance
                                     }
 
                                     outputItemList.Add(
-                                        $"Human,{blob.Index}, IsUp: {blob.IsUp}, Top: {blob.TopTime}, Bottom: {blob.BottomTime}, Cross: {blob.CrossTime}");
+                                        $"Human,{blob.Index}, IsUp: {blob.up}, Top: {blob.TopTime}, Bottom: {blob.BottomTime}, Cross: {blob.CrossedTime(LeftCoordinate.Value, RightCoordinate.Value)}");
 
                                     added = true;
                                 }
@@ -715,7 +721,7 @@ namespace VideoSurveilance
                     bool added = false;
                     MCvScalar color = new MCvScalar();
                     int thickness = 2;
-                    if (blob.IsUp)
+                    if (blob.up)
                     {
                         color = new MCvScalar(0, 255, 0);
                     }
@@ -730,12 +736,12 @@ namespace VideoSurveilance
                         thickness = 4;
                     }
 
-                    if (blob.IsUp && !this.showExitingPeople)
+                    if (blob.up && !this.showExitingPeople)
                     {
                         continue;
                     }
 
-                    if (!blob.IsUp && !this.showEnteringPeople)
+                    if (!blob.up && !this.showEnteringPeople)
                     {
                         continue;
                     }
@@ -750,9 +756,9 @@ namespace VideoSurveilance
                             if (!added)
                             {
                                 outputItemList.Add(
-                                    $"Machine,{blob.Index}, IsUp: {blob.IsUp}, Top: {blob.TopTime}, Bottom: {blob.BottomTime}, Cross: {blob.CrossTime}");
+                                    $"Machine,{blob.Index}, IsUp: {blob.up}, Top: {blob.TopTime}, Bottom: {blob.BottomTime}, Cross: {blob.CrossedTime(LeftCoordinate.Value, RightCoordinate.Value)}");
 
-                                if (blob.IsUp)
+                                if (blob.up)
                                 {
                                     machineExit++;
                                     machineExitGuess += CountPeople(blob.AverageSize);
@@ -779,6 +785,77 @@ namespace VideoSurveilance
                                 var offsetPoint = new Point(lastPoint.X + 1, lastPoint.Y + 1);
                                 CvInvoke.Line(drawFrame, lastPoint, offsetPoint, color, 10);
                             }
+                        }
+                    }
+                }
+            }
+
+            foreach (var blob in machineBlobs.Values)
+            {
+                bool added = false;
+                MCvScalar color = new MCvScalar();
+                int thickness = 2;
+                if (blob.up)
+                {
+                    color = new MCvScalar(0, 255, 0);
+                }
+                else
+                {
+                    color = new MCvScalar(0, 100, 0);
+                }
+
+                if (this.highlightedMachineBlobs.Contains(blob.Index))
+                {
+                    color = new MCvScalar(0, 255, 255);
+                    thickness = 4;
+                }
+
+                if (blob.up && !this.showExitingPeople)
+                {
+                    continue;
+                }
+
+                if (!blob.up && !this.showEnteringPeople)
+                {
+                    continue;
+                }
+
+                for (int i = 0; i < blob.Path.Count - 1; i++)
+                {
+                    var firstPoint = blob.Path[i].Item1;
+                    var lastPoint = blob.Path[i + 1].Item1;
+
+                    if (blob.Path[i].Item2 >= minFrame && blob.Path[i].Item2 <= maxFrame)
+                    {
+                        if (!added)
+                        {
+                            outputItemList.Add(
+                                $"Machine,{blob.Index}, IsUp: {blob.up}, Top: {blob.TopTime}, Bottom: {blob.BottomTime}, Cross: {blob.CrossedTime(LeftCoordinate.Value, RightCoordinate.Value)}");
+
+                            if (blob.up)
+                            {
+                                machineExit++;
+                            }
+                            else
+                            {
+                                machineEnter++;
+                            }
+
+                            added = true;
+                        }
+
+                        CvInvoke.Line(drawFrame, firstPoint, lastPoint, color, thickness);
+
+                        // Make the ends extra thick
+                        if (i == 0)
+                        {
+                            var offsetPoint = new Point(firstPoint.X + 1, firstPoint.Y + 1);
+                            CvInvoke.Line(drawFrame, firstPoint, offsetPoint, color, 10);
+                        }
+                        else if (i == blob.Path.Count - 2)
+                        {
+                            var offsetPoint = new Point(lastPoint.X + 1, lastPoint.Y + 1);
+                            CvInvoke.Line(drawFrame, lastPoint, offsetPoint, color, 10);
                         }
                     }
                 }
@@ -880,14 +957,20 @@ namespace VideoSurveilance
         private void BrowseForFile(object sender, EventArgs e)
         {
             OpenFileDialog browseFileDialog = new OpenFileDialog();
-            DialogResult userClickedOK = browseFileDialog.ShowDialog();
-            this.FileLocation = browseFileDialog.FileName;
-            this.fileNameTextBox.Text = browseFileDialog.FileName;
+            if (browseFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                this.FileLocation = browseFileDialog.FileName;
+                this.fileNameTextBox.Text = browseFileDialog.FileName;
+
+                this.lblSkipToFrame.Visible = true;
+                this.txtSkipToFrame.Visible = true;
+                this.cmdSkipToFrame.Visible = true;
+            }
         }
 
         private void continueButton_Click(object sender, EventArgs e)
         {
-            if(this.RightCoordinate != null && this.LeftCoordinate != null)
+            if (this.RightCoordinate != null && this.LeftCoordinate != null)
             {
                 this.messaging.Text = String.Empty;
                 this.IsCaptureHeight = false;
@@ -912,6 +995,30 @@ namespace VideoSurveilance
 
             this.continueButton.Hide();
         }
+
+        private void cmdSkipToFrame_Click(object sender, EventArgs e)
+        {
+            this.LoadVideo();
+            int frameSkip = Int32.Parse(this.txtSkipToFrame.Text);
+            for (int i = 0; i < frameSkip; i++)
+            {
+                Mat frame = _cameraCapture.QueryFrame();
+            }
+
+            this.currentFrame = frameSkip;
+        }
+
+        private void cmdStopFrame_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(this.txtStopFrame.Text))
+            {
+                this.stopAtFrame = null;
+            }
+            else
+            {
+                this.stopAtFrame = Int32.Parse(this.txtStopFrame.Text);
+            }
+        }
     }
 
     public class ComparisonBlob
@@ -920,7 +1027,39 @@ namespace VideoSurveilance
 
         public List<Tuple<Point, double>> Path { get; set; }
 
-        public bool IsUp { get; set; }
+        private bool? _up = null;
+
+        public void setUp(bool newUp)
+        {
+            _up = newUp;
+        }
+
+        public bool up
+        {
+            get
+            {
+                if (_up.HasValue)
+                {
+                    return _up.Value;
+                }
+                // Average the first 1/4 and the last 1/4
+                var first = Path.Take(Path.Count / 4);
+                List<double> firstY = new List<double>();
+                var last = Path.Skip(3 * (Path.Count / 4));
+                List<double> secondY = new List<double>();
+                foreach (var element in first)
+                {
+                    firstY.Add(element.Item1.Y);
+                }
+
+                foreach (var element in last)
+                {
+                    secondY.Add(element.Item1.Y);
+                }
+
+                return firstY.Average() < secondY.Average();
+            }
+        }
 
         private double? minFrame = null;
         private double? maxFrame = null;
@@ -988,7 +1127,7 @@ namespace VideoSurveilance
         {
             get
             {
-                if (this.IsUp)
+                if (this.up)
                 {
                     return this.Path.Last().Item2;
                 }
@@ -997,13 +1136,62 @@ namespace VideoSurveilance
                     return this.Path.First().Item2;
                 }
             }
+        }
+
+        public bool crossedThreshold(Point left, Point right, Point? first = null, Point? second = null)
+        {
+            if (Path.Count < 2)
+            {
+                return false;
+            }
+            Point P1;
+            Point P2;
+            if (first.HasValue && second.HasValue)
+            {
+                P1 = first.Value;
+                P2 = second.Value;
+            }
+            else
+            {
+                P1 = Path.Last().Item1;
+                P2 = Path.First().Item1;
+            }
+            double a1 = (P1.Y - P2.Y) / (double)(P1.X - P2.X);
+            double b1 = P1.Y - a1 * P1.X;
+
+            double a2 = (left.Y - right.Y) / (double)(left.X - right.X);
+            double b2 = left.Y - a2 * left.X;
+
+            if (Math.Abs(a1 - a2) < double.Epsilon)
+                throw new InvalidOperationException();
+
+            double x = (b2 - b1) / (a1 - a2);
+            double y = a1 * x + b1;
+            return x < Math.Min(Math.Max(P1.X, P2.X), Math.Max(left.X, right.X)) &&
+                y < Math.Min(Math.Max(P1.Y, P2.Y), Math.Max(left.Y, right.Y));
+        }
+
+        public double CrossedTime(Point leftCoordinate, Point rightCoordinate)
+        {
+            if (!crossedThreshold(leftCoordinate, rightCoordinate))
+            {
+                return -1;
+            }
+            for(var i = 0; i < Path.Count - 2; i++)
+            {
+                if(crossedThreshold(leftCoordinate, rightCoordinate, Path[i].Item1, Path[i + 1].Item1))
+                {
+                    return Path[i + 1].Item2;
+                }
+            }
+            return -1;
         }
 
         public double BottomTime
         {
             get
             {
-                if (!this.IsUp)
+                if (!this.up)
                 {
                     return this.Path.Last().Item2;
                 }
@@ -1012,37 +1200,6 @@ namespace VideoSurveilance
                     return this.Path.First().Item2;
                 }
 
-            }
-        }
-
-        public double CrossTime
-        {
-            get
-            {
-                if (this.IsUp)
-                {
-                    foreach (var path in this.Path)
-                    {
-                        if (path.Item1.Y < VideoSurveilance.MiddleLine)
-                        {
-                            return path.Item2;
-                        }
-                    }
-
-                    return 0;
-                }
-                else
-                {
-                    foreach (var path in this.Path)
-                    {
-                        if (path.Item1.Y > VideoSurveilance.MiddleLine)
-                        {
-                            return path.Item2;
-                        }
-                    }
-
-                    return 0;
-                }
             }
         }
 
@@ -1052,7 +1209,7 @@ namespace VideoSurveilance
         }
     }
 
-    public class MovingBlob
+    public class MovingBlob : ComparisonBlob
     {
         public int id;
         public double xstart;
@@ -1061,38 +1218,23 @@ namespace VideoSurveilance
         public double yend;
         public double averagesize;
         public int frames;
-        public List<Tuple<Point, double>> path = new List<Tuple<Point, double>>();
         public int lastFrame;
 
         public double distance
         {
             get
             {
-                if (path == null || path.Count == 0)
+                if (Path == null || Path.Count == 0)
                 {
                     return 0;
                 }
-                return Distance(path.First().Item1, path.Last().Item1);
+                return Distance(Path.First().Item1, Path.Last().Item1);
             }
         }
 
         public static double Distance(Point point1, Point point2)
         {
             return Math.Sqrt(Math.Pow(point1.X - point2.X, 2) + Math.Pow(point1.Y - point2.Y, 2));
-        }
-
-        public bool crossedY(Point left, Point right)
-        {
-            if (path.Count < 2)
-            {
-                return false;
-            }
-
-            // TODO: Replace this logic
-            return path.First().Item1.Y > 240 ^ path.Last().Item1.Y > 240;
-
-            //throw;
-            //return true;// path.First().Item1.Y > height ^ path.Last().Item1.Y > height;
         }
 
         /// <summary>
@@ -1111,29 +1253,6 @@ namespace VideoSurveilance
             }
         }
 
-        public bool up
-        {
-            get
-            {
-                // Average the first 1/4 and the last 1/4
-                var first = path.Take(path.Count / 4);
-                List<double> firstY = new List<double>();
-                var last = path.Skip(3 * (path.Count / 4));
-                List<double> secondY = new List<double>();
-                foreach (var element in first)
-                {
-                    firstY.Add(element.Item1.Y);
-                }
-
-                foreach (var element in last)
-                {
-                    secondY.Add(element.Item1.Y);
-                }
-
-                return firstY.Average() > secondY.Average();
-            }
-        }
-
         public void AddToAverage(double next)
         {
             averagesize -= averagesize / frames;
@@ -1142,50 +1261,38 @@ namespace VideoSurveilance
 
         public void CleanPath(double distance = 100)
         {
-            for (int i = path.Count - 1; i >= 1; i--)
+            for (int i = Path.Count - 1; i >= 1; i--)
             {
-                if (Distance(path[i].Item1, path[i - 1].Item1) > distance)
+                if (Distance(Path[i].Item1, Path[i - 1].Item1) > distance)
                 {
-                    path.Remove(path[i]);
+                    Path.Remove(Path[i]);
                 }
             }
-        }
-
-        public double CrossedTime(int height)
-        {
-            // TOOO: Change this on merge
-            Point point = new Point();
-
-            if (!crossedY(point, point))
-            {
-                throw new Exception("Crossed time is undefined");
-            }
-            return (up ? path.First(p => p.Item1.Y > height) : path.First(p => p.Item1.Y < height)).Item2;
         }
 
         public Point Momentum()
         {
-            if (path == null || path.Count == 0)
+            if (Path == null || Path.Count == 0)
             {
                 return new Point();
             }
-            if (path.Count == 1)
+            if (Path.Count == 1)
             {
-                return path.Last().Item1;
+                return Path.Last().Item1;
             }
-            var previous = path[path.Count - 2].Item1;
-            var diff = path.Last().Item1.Subtract(previous);
+            var previous = Path[Path.Count - 2].Item1;
+            var diff = Path.Last().Item1.Subtract(previous);
             var diffs = new List<Point>();
 
             for (int i = 0; i < 5; i++)
             {
-                if (path.Count - i - 2 > 0)
+                if (Path.Count - i - 2 > 0)
                 {
-                    diffs.Add(path[path.Count - i - 1].Item1.Subtract(path[path.Count - i - 2].Item1));
+                    diffs.Add(Path[Path.Count - i - 1].Item1.Subtract(Path[Path.Count - i - 2].Item1));
                 }
             }
 
-            return path.Last().Item1.Add(diffs.Select(d => d.Multiply(3)).Average());
+            return Path.Last().Item1.Add(diffs.Select(d => d.Multiply(3)).Average());
         }
     }
 
