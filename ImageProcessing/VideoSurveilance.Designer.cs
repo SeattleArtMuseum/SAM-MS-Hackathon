@@ -768,7 +768,6 @@ namespace VideoSurveilance
             this.label2.Text = "Forground Mask";
             this.label2.Visible = false;
             // 
-<<<<<<< HEAD
             // label8
             // 
             this.label8.AutoSize = true;
@@ -776,7 +775,7 @@ namespace VideoSurveilance
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(0, 20);
             this.label8.TabIndex = 32;
-=======
+            //
             // animation
             // 
             this.animation.Location = new System.Drawing.Point(12, 216);
@@ -807,7 +806,6 @@ namespace VideoSurveilance
             this.lstVideoOutput.Size = new System.Drawing.Size(545, 56);
             this.lstVideoOutput.TabIndex = 38;
             this.lstVideoOutput.Visible = false;
->>>>>>> 0190f07d60939169c72727528d6e44299348a92d
             // 
             // VideoSurveilance
             // 
