@@ -630,7 +630,7 @@ namespace VideoSurveilance
 
             if (this.FilesAnnotated < videofiles.Count())
             {
-                label8.Text = "Annotating :" + videofiles[FilesAnnotated];
+                label8.Text = "Annotating: " + videofiles[FilesAnnotated];
                 FileLocation = videofiles[FilesAnnotated];
 
                 resetButton_Click(sender, e);
