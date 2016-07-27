@@ -485,6 +485,10 @@ namespace VideoSurveilance
                         CvInvoke.Line(previousframe, blob.Path.First().Item1, blob.Path.Last().Item1, new MCvScalar(r, g, b), normalSize);
                     }
                 }
+                if (thresholdindex == thresholds.Count())
+                {
+                    MessageBox.Show("All files processed");
+                }
             }
 
             // Write verbose output so that we can re-plot items
@@ -624,9 +628,10 @@ namespace VideoSurveilance
 
             if (this.FilesAnnotated < videofiles.Count())
             {
-                this.FileLocation = videofiles[this.FilesAnnotated];
+                label8.Text = "Annotating :" + videofiles[FilesAnnotated];
+                FileLocation = videofiles[FilesAnnotated];
 
-                this.resetButton_Click(sender, e);
+                resetButton_Click(sender, e);
 
                 _cameraCapture = new Capture(videofiles[this.FilesAnnotated]);
                 Mat frame1 = _cameraCapture.QueryFrame();
@@ -657,6 +662,7 @@ namespace VideoSurveilance
 
                 tableClient.InsertRecord("Event", eventTable);
 
+                label8.Text = "";
                 Run();
             }
         }
