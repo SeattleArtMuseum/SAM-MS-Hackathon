@@ -24,6 +24,7 @@ namespace VideoSurveilance
     {
         public static string CSV_PATH = "SAMoutput.csv";
         public static string VerboseCsvPath = "SAMoutput_verbose.csv";
+        public static readonly string THRESHOLD_PATH = "SAMCAMThresholds";
 
         private static Capture _cameraCapture;
 
@@ -126,6 +127,83 @@ namespace VideoSurveilance
             {
                 MessageBox.Show(e.Message);
                 return;
+            }
+        }
+
+        /// <summary>
+        /// Saves thresholds to file
+        /// </summary>
+        /// <param name="thresholds">A list of thresholds: the filename, the left point, the right point</param>
+        /// <param name="filename">If you want to override</param>
+        /// <returns></returns>
+        public bool SaveThresholdsToFile(List<Tuple<string, Point, Point>> thresholds, string filename = null)
+        {
+            filename = filename == null ? THRESHOLD_PATH : filename;
+
+            try
+            {
+                using (var writer = new StreamWriter(filename, false))
+                {
+                    foreach (var line in thresholds)
+                    {
+                        writer.WriteLine(line.Item1 + "," +
+                            line.Item2.X + "," +
+                            line.Item2.Y + "," +
+                            line.Item3.X + "," +
+                            line.Item3.Y);
+                    }
+                }
+                return true;
+            }
+            catch(Exception e)
+            {
+                MessageBox.Show("Error saving thresholds: " + e.Message);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Loads saved thresholds from a file
+        /// </summary>
+        /// <param name="filename">If you want to override</param>
+        /// <returns>A list of thresholds: the filename, the left point, the right point</returns>
+        public List<Tuple<string, Point, Point>> LoadThresholdsFromFile(string filename =null)
+        {
+            filename = filename == null ? THRESHOLD_PATH : filename;
+
+            if (!File.Exists(filename))
+            {
+                MessageBox.Show("Unable to find saved thresholds");
+                return null;
+            }
+            try
+            {
+                var toreturn = new List<Tuple<string, Point, Point>>();
+                using (var reader = new StreamReader(filename))
+                {
+                    var line = reader.ReadLine();
+                    while(line != null)
+                    {
+                        var split = line.Split(',');
+                        if (split.Count() != 5)
+                        {
+                            MessageBox.Show("Incorrectly formatted threshold file");
+                            return toreturn;//return what we've got at least
+                        }
+                        toreturn.Add(new Tuple<string, Point, Point>(
+                            split[0],
+                            new Point(int.Parse(split[1]), int.Parse(split[2])),
+                            new Point(int.Parse(split[3]), int.Parse(split[4]))));
+
+                        line = reader.ReadLine();
+                    }
+                }
+                return toreturn;
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Error reading file: \"" + e.Message + "\"");
+                return null;
             }
         }
 
