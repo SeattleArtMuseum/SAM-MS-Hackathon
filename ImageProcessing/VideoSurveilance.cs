@@ -636,6 +636,8 @@ namespace VideoSurveilance
             else
             {
                 SaveThresholdsToFile(this.thresholds);
+                this.continueButton.Hide();
+                this.resetButton.Hide();
                 Run();
             }
         }
