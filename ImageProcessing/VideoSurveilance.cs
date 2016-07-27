@@ -22,6 +22,31 @@ namespace VideoSurveilance
 
     public partial class VideoSurveilance : Form
     {
+        /// <summary>
+        /// Timer for animation
+        /// </summary>
+        private Timer timer = new Timer();
+
+        /// <summary>
+        /// Dictionary of animations
+        /// </summary>
+        private Dictionary<int, List<Bitmap>> highlightedBitmaps = new Dictionary<int, List<Bitmap>>();
+
+        /// <summary>
+        /// Animation frame
+        /// </summary>
+        private int animationFrame = 0;
+
+        /// <summary>
+        /// Item we're animating
+        /// </summary>
+        private int animationIndex = 0;
+
+        /// <summary>
+        /// Whether to save animations or not
+        /// </summary>
+        private bool enableAnimations = false;
+
         public static string CSV_PATH = "SAMoutput.csv";
         public static string VerboseCsvPath = "SAMoutput_verbose.csv";
         public static readonly string THRESHOLD_PATH = "SAMCAMThresholds";
@@ -31,8 +56,6 @@ namespace VideoSurveilance
         private static BackgroundSubtractor _fgDetector;
         private static CvBlobDetector _blobDetector;
         private static CvTracks _tracker;
-
-        private bool IsCompareMode = false;
 
         private string FileLocation;
         private string FileDirectoryLocation;
@@ -105,6 +128,9 @@ namespace VideoSurveilance
 
         public VideoSurveilance()
         {
+            timer.Tick += new EventHandler(HandleTick);
+            timer.Enabled = false;
+
             tableClient = new TableStorageClient(Constants.StorageConnectionString);
             thresholds = new List<Tuple<string, Point, Point>>();
             InitializeComponent();
@@ -318,13 +344,9 @@ namespace VideoSurveilance
             {
                 CvTrack blob = pair.Value;
 
-                if (movingblobs.ContainsKey((int)blob.Id))
+                if (blobMap.ContainsKey((int)blob.Id))
                 {
-                    var saved = movingblobs[(int)blob.Id];
-                    if (blobMap.ContainsKey(saved.id))
-                    {
-                        saved = movingblobs[blobMap[saved.id]];
-                    }
+                    var saved = movingblobs[blobMap[(int)blob.Id]];
 
                     // If it's been more than 4 seconds since this blob last appeared, then
                     // it's probably a new item. We need to map it to the latest blob.
@@ -374,6 +396,15 @@ namespace VideoSurveilance
                     saved.AddToAverage(blob.BoundingBox.Height * blob.BoundingBox.Width);
                     saved.frames += 1;
                     saved.lastFrame = currentFrame;
+
+                    if (enableAnimations)
+                    {
+                        Bitmap bmp = new Bitmap(blob.BoundingBox.Width, blob.BoundingBox.Height);
+                        Graphics g = Graphics.FromImage(bmp);
+                        g.DrawImage(frame.Bitmap, 0, 0, blob.BoundingBox, GraphicsUnit.Pixel);
+                        g.Dispose();
+                        saved.Bitmaps.Add(bmp);
+                    }
 
                     if (saved.frames >= FrameThreshold)
                     {
@@ -512,13 +543,24 @@ namespace VideoSurveilance
             // Write verbose output so that we can re-plot items
             using (StreamWriter writer = new StreamWriter(VerboseCsvPath))
             {
+                //this.lstVideoOutput.Visible = true;
+                this.lstVideoOutput.Items.Clear();
+
+                this.highlightedBitmaps = new Dictionary<int, List<Bitmap>>();
                 writer.WriteLine("Id,X,Y,Frame,IsUp,AverageSize");
                 foreach (var blob in validblobs)
                 {
+                    if (this.enableAnimations)
+                    {
+                        this.highlightedBitmaps.Add(blob.id, blob.Bitmaps);
+                    }
+
                     foreach (var path in blob.Path)
                     {
                         writer.WriteLine($"{blob.id},{path.Item1.X},{path.Item1.Y},{path.Item2},{blob.up},{blob.averagesize}");
                     }
+
+                    this.lstVideoOutput.Items.Add($"Machine,{blob.id},Frames: {blob.frames}, Up: {blob.up}, Calcaulted Size: {CountPeople(blob.averagesize)}");
                 }
             }
 
@@ -534,9 +576,13 @@ namespace VideoSurveilance
 
         private MovingBlob CreateMovingBlob(CvTrack blob, int currentFrame, bool updateMap = false)
         {
+            int originalId = (int)blob.Id;
+            int newId = 10000 + newIdOffset;
+            newIdOffset++;
+
             var movingBlob = new MovingBlob
             {
-                id = (int)blob.Id,
+                id = newId,
                 xstart = blob.Centroid.X,
                 ystart = blob.Centroid.Y,
                 xend = blob.Centroid.X,
@@ -546,32 +592,18 @@ namespace VideoSurveilance
                 lastFrame = currentFrame
             };
 
-            // It's not valid for a new person to appear in the middle of the image, so filter those out
-            if (movingBlob.averagesize < (150 * 150))
-            //if (true || movingBlob.ystart < 100 || movingBlob.ystart > 350)
+            // Update the map
+            if (!blobMap.ContainsKey((int)blob.Id))
             {
-                if (updateMap)
-                {
-                    // Create a new id
-                    movingBlob.id = 10000 + newIdOffset;
-                    newIdOffset++;
-
-                    // Update the map
-                    if (!blobMap.ContainsKey((int)blob.Id))
-                    {
-                        blobMap.Add((int)blob.Id, movingBlob.id);
-                    }
-                    else
-                    {
-                        blobMap[(int)blob.Id] = movingBlob.id;
-                    }
-                }
-
-                movingblobs.Add(movingBlob.id, movingBlob);
-                return movingBlob;
+                blobMap.Add(originalId, movingBlob.id);
+            }
+            else
+            {
+                blobMap[originalId] = movingBlob.id;
             }
 
-            return null;
+            movingblobs.Add(movingBlob.id, movingBlob);
+            return movingBlob;
         }
 
         private void imageBox1_MouseClick(object sender, MouseEventArgs e)
@@ -1181,6 +1213,66 @@ namespace VideoSurveilance
         {
 
         }
+
+
+        private void HandleTick(object sender, EventArgs e)
+        {
+            if (this.highlightedBitmaps[animationIndex].Count == 0)
+            {
+                return;
+            }
+
+            this.animation.Image = this.highlightedBitmaps[animationIndex][animationFrame];
+            this.animation.Width = this.highlightedBitmaps[animationIndex][animationFrame].Width;
+            this.animation.Height = this.highlightedBitmaps[animationIndex][animationFrame].Height;
+
+            animationFrame++;
+            if (animationFrame >= this.highlightedBitmaps[animationIndex].Count)
+            {
+                this.animationFrame = 0;
+            }
+        }
+
+        private void cmdPlayVideoFromOutput_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void cmdPlayVideoFromOutput_Click_1(object sender, EventArgs e)
+        {
+            this.animation.Visible = false;
+            bool found = false;
+            foreach (var item in this.lstVideoOutput.SelectedItems)
+            {
+                string[] columns = item.ToString().Split(',');
+                if (columns[0] == "Machine")
+                {
+                    animationIndex = Int32.Parse(columns[1]);
+                    if (this.highlightedBitmaps.ContainsKey(animationIndex) &&
+                        this.highlightedBitmaps[animationIndex].Count > 0)
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+
+            if (found)
+            {
+                this.animation.Visible = true;
+                animationFrame = 0;
+                timer.Interval = 100;
+                timer.Enabled = true;
+                timer.Start();
+            }
+            else
+            {
+                this.animation.Visible = false;
+                this.animationFrame = 0;
+                timer.Enabled = false;
+                timer.Stop();
+            }
+        }
     }
 
     public class ComparisonBlob
@@ -1325,7 +1417,7 @@ namespace VideoSurveilance
             double b2 = left.Y - a2 * left.X;
 
             if (Math.Abs(a1 - a2) < double.Epsilon)
-                throw new InvalidOperationException();
+                return false;
 
             double x = (b2 - b1) / (a1 - a2);
             double y = a1 * x + b1;
@@ -1381,6 +1473,8 @@ namespace VideoSurveilance
         public double averagesize;
         public int frames;
         public int lastFrame;
+
+        public List<Bitmap> Bitmaps = new List<Bitmap>();
 
         public double distance
         {
