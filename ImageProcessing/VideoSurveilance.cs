@@ -35,6 +35,7 @@ namespace VideoSurveilance
         private bool IsCompareMode = false;
 
         private string FileLocation;
+        private string FileDirectoryLocation;
         private Point? LeftCoordinate = null;
         private Point? RightCoordinate = null;
 
@@ -600,14 +601,14 @@ namespace VideoSurveilance
 
         private void cmdStartVideo_Click(object sender, EventArgs e)
         {
-            if (String.IsNullOrWhiteSpace(this.FileLocation) || String.IsNullOrWhiteSpace(this.eventName2.Text))
+            if (String.IsNullOrWhiteSpace(this.FileDirectoryLocation) || String.IsNullOrWhiteSpace(this.eventName2.Text))
             {
                 MessageBox.Show("Please select a file and enter an event name first");
                 return;
             }
 
             // Get all files in directory
-            string[] files = Directory.GetFiles(this.FileLocation);
+            string[] files = Directory.GetFiles(this.FileDirectoryLocation);
 
             if (this.FilesAnnotated < files.Length)
             {
@@ -634,6 +635,7 @@ namespace VideoSurveilance
             }
             else
             {
+                SaveThresholdsToFile(this.thresholds);
                 Run();
             }
         }
@@ -1063,7 +1065,7 @@ namespace VideoSurveilance
             FolderBrowserDialog browseFolder = new FolderBrowserDialog();
             if (browseFolder.ShowDialog() == DialogResult.OK)
             {
-                this.FileLocation = browseFolder.SelectedPath;
+                this.FileDirectoryLocation = browseFolder.SelectedPath;
                 this.fileNameTextBox.Text = browseFolder.SelectedPath;
             }
         }
@@ -1087,11 +1089,14 @@ namespace VideoSurveilance
             this.LeftCoordinate = null;
             this.RightCoordinate = null;
 
-            Mat drawFrame = _cameraCapture.QueryFrame();
-            imageBox1.Image = drawFrame;
-            imageBox1.Refresh();
+            if(_cameraCapture != null)
+            {
+                Mat drawFrame = _cameraCapture.QueryFrame();
+                imageBox1.Image = drawFrame;
+                imageBox1.Refresh();
 
-            this.continueButton.Hide();
+                this.continueButton.Hide();
+            }
         }
 
         private void cmdSkipToFrame_Click(object sender, EventArgs e)
