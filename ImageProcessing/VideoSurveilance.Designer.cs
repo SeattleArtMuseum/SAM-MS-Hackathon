@@ -214,9 +214,9 @@ namespace VideoSurveilance
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(12, 13);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(98, 13);
+            this.label1.Size = new System.Drawing.Size(111, 13);
             this.label1.TabIndex = 0;
-            this.label1.Text = "1) Select Video File";
+            this.label1.Text = "1) Select Video Folder";
             // 
             // cmdStopFrame
             // 
@@ -625,9 +625,9 @@ namespace VideoSurveilance
             this.label4.AutoSize = true;
             this.label4.Location = new System.Drawing.Point(12, 106);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(92, 13);
+            this.label4.Size = new System.Drawing.Size(97, 13);
             this.label4.TabIndex = 27;
-            this.label4.Text = "3) Annotate Video";
+            this.label4.Text = "3) Annotate Videos";
             // 
             // VideoSurveilance
             // 

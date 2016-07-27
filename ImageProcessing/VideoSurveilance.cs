@@ -40,6 +40,8 @@ namespace VideoSurveilance
 
         private bool IsCaptureHeight = false;
 
+        private int FilesAnnotated = 0;
+
         // Number of frames that a blob must appear before we save it
         public const int FrameThreshold = 90;
 
@@ -63,6 +65,8 @@ namespace VideoSurveilance
         private bool showHumanResults = true;
         private List<int> highlightedHumanBlobs = new List<int>();
         private List<int> highlightedMachineBlobs = new List<int>();
+
+        private List<Tuple<string, Point, Point>> thresholds;
 
         /// <summary>
         /// Blob id to show detailed information for
@@ -97,6 +101,7 @@ namespace VideoSurveilance
         public VideoSurveilance()
         {
             tableClient = new TableStorageClient(Constants.StorageConnectionString);
+            thresholds = new List<Tuple<string, Point, Point>>();
             InitializeComponent();
         }
 
@@ -600,15 +605,37 @@ namespace VideoSurveilance
                 MessageBox.Show("Please select a file and enter an event name first");
                 return;
             }
-            LoadVideo();
 
-            Mat frame = _cameraCapture.QueryFrame();
-            imageBox1.Image = frame;
-            IsCaptureHeight = true;
-            this.messaging.Text = "Next we'll define the entrance to the park.  Click on the image twice.  Once on the left side of the entrance, and next on the right side.  People who cross this line will be counted.  If this is correct, press continue.  Otherwise click again.";
-            this.messaging.Show();
-            this.messaging.Refresh();
-            imageBox1.Refresh();
+            // Get all files in directory
+            string[] files = Directory.GetFiles(this.FileLocation);
+
+            if (this.FilesAnnotated < files.Length)
+            {
+                this.FileLocation = files[this.FilesAnnotated];
+
+                this.resetButton_Click(sender, e);
+
+                _cameraCapture = new Capture(files[this.FilesAnnotated]);
+                Mat frame1 = _cameraCapture.QueryFrame();
+                // Advance to 5th frame
+                for (int k = 0; k < 5; k++)
+                {
+                    frame1 = _cameraCapture.QueryFrame();
+                }
+
+                imageBox1.Image = frame1;
+                IsCaptureHeight = true;
+                this.messaging.Text = "Next we'll define the entrance to the park.  Click on the image twice.  Once on the left side of the entrance, and next on the right side.  People who cross this line will be counted.  If this is correct, press continue.  Otherwise click again.";
+                this.messaging.Show();
+                this.messaging.Refresh();
+                imageBox1.Refresh();
+                
+                this.FilesAnnotated++;
+            }
+            else
+            {
+                Run();
+            }
         }
 
         private void cmdCompare_Click(object sender, EventArgs e)
@@ -1033,12 +1060,11 @@ namespace VideoSurveilance
 
         private void BrowseForFile(object sender, EventArgs e)
         {
-            OpenFileDialog browseFileDialog = new OpenFileDialog();
-            if (browseFileDialog.ShowDialog() == DialogResult.OK)
+            FolderBrowserDialog browseFolder = new FolderBrowserDialog();
+            if (browseFolder.ShowDialog() == DialogResult.OK)
             {
-                this.FileLocation = browseFileDialog.FileName;
-                this.fileNameTextBox.Text = browseFileDialog.FileName;
-
+                this.FileLocation = browseFolder.SelectedPath;
+                this.fileNameTextBox.Text = browseFolder.SelectedPath;
             }
         }
 
@@ -1046,11 +1072,9 @@ namespace VideoSurveilance
         {
             if (this.RightCoordinate != null && this.LeftCoordinate != null)
             {
-                this.messaging.Text = String.Empty;
-                this.IsCaptureHeight = false;
-                this.continueButton.Hide();
-                this.resetButton.Hide();
-                Run();
+                Tuple<string, Point, Point> tuple = new Tuple<string, Point, Point>(this.FileLocation, (Point)this.RightCoordinate, (Point)this.LeftCoordinate);
+                this.thresholds.Add(tuple);
+                cmdStartVideo_Click(sender, e);
             }
             else
             {
