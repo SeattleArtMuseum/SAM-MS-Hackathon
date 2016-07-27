@@ -79,6 +79,7 @@ namespace VideoSurveilance
             this.label3 = new System.Windows.Forms.Label();
             this.txtId = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -143,9 +144,9 @@ namespace VideoSurveilance
             // imageBox1
             // 
             this.imageBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.imageBox1.Location = new System.Drawing.Point(0, 103);
+            this.imageBox1.Location = new System.Drawing.Point(0, 167);
             this.imageBox1.Name = "imageBox1";
-            this.imageBox1.Size = new System.Drawing.Size(551, 449);
+            this.imageBox1.Size = new System.Drawing.Size(551, 385);
             this.imageBox1.TabIndex = 2;
             this.imageBox1.TabStop = false;
             this.imageBox1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.imageBox1_MouseClick);
@@ -153,6 +154,7 @@ namespace VideoSurveilance
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.label4);
             this.panel1.Controls.Add(this.eventName2);
             this.panel1.Controls.Add(this.eventName);
             this.panel1.Controls.Add(this.browse);
@@ -162,12 +164,12 @@ namespace VideoSurveilance
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(551, 103);
+            this.panel1.Size = new System.Drawing.Size(551, 167);
             this.panel1.TabIndex = 0;
             // 
             // eventName2
             // 
-            this.eventName2.Location = new System.Drawing.Point(93, 58);
+            this.eventName2.Location = new System.Drawing.Point(118, 58);
             this.eventName2.Name = "eventName2";
             this.eventName2.Size = new System.Drawing.Size(149, 20);
             this.eventName2.TabIndex = 26;
@@ -177,13 +179,13 @@ namespace VideoSurveilance
             this.eventName.AutoSize = true;
             this.eventName.Location = new System.Drawing.Point(12, 59);
             this.eventName.Name = "eventName";
-            this.eventName.Size = new System.Drawing.Size(66, 13);
+            this.eventName.Size = new System.Drawing.Size(106, 13);
             this.eventName.TabIndex = 25;
-            this.eventName.Text = "Event Name";
+            this.eventName.Text = "2) Enter Event Name";
             // 
             // browse
             // 
-            this.browse.Location = new System.Drawing.Point(248, 8);
+            this.browse.Location = new System.Drawing.Point(273, 8);
             this.browse.Name = "browse";
             this.browse.Size = new System.Drawing.Size(90, 30);
             this.browse.TabIndex = 0;
@@ -192,18 +194,18 @@ namespace VideoSurveilance
             // 
             // fileNameTextBox
             // 
-            this.fileNameTextBox.Location = new System.Drawing.Point(93, 12);
+            this.fileNameTextBox.Location = new System.Drawing.Point(118, 12);
             this.fileNameTextBox.Name = "fileNameTextBox";
             this.fileNameTextBox.Size = new System.Drawing.Size(149, 20);
             this.fileNameTextBox.TabIndex = 24;
             // 
             // cmdStartVideo
             // 
-            this.cmdStartVideo.Location = new System.Drawing.Point(374, 59);
+            this.cmdStartVideo.Location = new System.Drawing.Point(118, 97);
             this.cmdStartVideo.Name = "cmdStartVideo";
             this.cmdStartVideo.Size = new System.Drawing.Size(82, 30);
             this.cmdStartVideo.TabIndex = 8;
-            this.cmdStartVideo.Text = "Start Video";
+            this.cmdStartVideo.Text = "Annotate";
             this.cmdStartVideo.UseVisualStyleBackColor = true;
             this.cmdStartVideo.Click += new System.EventHandler(this.cmdStartVideo_Click);
             // 
@@ -212,9 +214,9 @@ namespace VideoSurveilance
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(12, 13);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(53, 13);
+            this.label1.Size = new System.Drawing.Size(98, 13);
             this.label1.TabIndex = 0;
-            this.label1.Text = "Video File";
+            this.label1.Text = "1) Select Video File";
             // 
             // cmdStopFrame
             // 
@@ -224,6 +226,7 @@ namespace VideoSurveilance
             this.cmdStopFrame.TabIndex = 33;
             this.cmdStopFrame.Text = "Ok";
             this.cmdStopFrame.UseVisualStyleBackColor = true;
+            this.cmdStopFrame.Visible = false;
             this.cmdStopFrame.Click += new System.EventHandler(this.cmdStopFrame_Click);
             // 
             // txtStopFrame
@@ -232,6 +235,7 @@ namespace VideoSurveilance
             this.txtStopFrame.Name = "txtStopFrame";
             this.txtStopFrame.Size = new System.Drawing.Size(34, 20);
             this.txtStopFrame.TabIndex = 32;
+            this.txtStopFrame.Visible = false;
             // 
             // cmdCompare
             // 
@@ -241,6 +245,7 @@ namespace VideoSurveilance
             this.cmdCompare.TabIndex = 9;
             this.cmdCompare.Text = "Compare Results";
             this.cmdCompare.UseVisualStyleBackColor = true;
+            this.cmdCompare.Visible = false;
             this.cmdCompare.Click += new System.EventHandler(this.cmdCompare_Click);
             // 
             // label5
@@ -251,6 +256,7 @@ namespace VideoSurveilance
             this.label5.Size = new System.Drawing.Size(76, 13);
             this.label5.TabIndex = 31;
             this.label5.Text = "Stop at Frame:";
+            this.label5.Visible = false;
             // 
             // cmdSkipToFrame
             // 
@@ -283,7 +289,7 @@ namespace VideoSurveilance
             // 
             // resetButton
             // 
-            this.resetButton.Location = new System.Drawing.Point(6, 106);
+            this.resetButton.Location = new System.Drawing.Point(6, 167);
             this.resetButton.Name = "resetButton";
             this.resetButton.Size = new System.Drawing.Size(75, 23);
             this.resetButton.TabIndex = 27;
@@ -294,7 +300,7 @@ namespace VideoSurveilance
             // 
             // continueButton
             // 
-            this.continueButton.Location = new System.Drawing.Point(113, 106);
+            this.continueButton.Location = new System.Drawing.Point(113, 167);
             this.continueButton.Name = "continueButton";
             this.continueButton.Size = new System.Drawing.Size(75, 23);
             this.continueButton.TabIndex = 26;
@@ -305,11 +311,13 @@ namespace VideoSurveilance
             // 
             // messaging
             // 
+            this.messaging.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.messaging.Location = new System.Drawing.Point(3, 58);
             this.messaging.Multiline = true;
             this.messaging.Name = "messaging";
-            this.messaging.Size = new System.Drawing.Size(560, 45);
+            this.messaging.Size = new System.Drawing.Size(560, 109);
             this.messaging.TabIndex = 25;
+            this.messaging.Visible = false;
             // 
             // chkHuman
             // 
@@ -504,6 +512,7 @@ namespace VideoSurveilance
             this.cmdCopy.TabIndex = 8;
             this.cmdCopy.Text = "Copy";
             this.cmdCopy.UseVisualStyleBackColor = true;
+            this.cmdCopy.Visible = false;
             this.cmdCopy.Click += new System.EventHandler(this.cmdCopy_Click);
             // 
             // txtTrackOutput
@@ -513,6 +522,7 @@ namespace VideoSurveilance
             this.txtTrackOutput.Name = "txtTrackOutput";
             this.txtTrackOutput.Size = new System.Drawing.Size(560, 93);
             this.txtTrackOutput.TabIndex = 6;
+            this.txtTrackOutput.Visible = false;
             // 
             // txtIdDetails
             // 
@@ -520,6 +530,7 @@ namespace VideoSurveilance
             this.txtIdDetails.Name = "txtIdDetails";
             this.txtIdDetails.Size = new System.Drawing.Size(560, 20);
             this.txtIdDetails.TabIndex = 5;
+            this.txtIdDetails.Visible = false;
             // 
             // txtPosition
             // 
@@ -527,6 +538,7 @@ namespace VideoSurveilance
             this.txtPosition.Name = "txtPosition";
             this.txtPosition.Size = new System.Drawing.Size(560, 20);
             this.txtPosition.TabIndex = 4;
+            this.txtPosition.Visible = false;
             // 
             // textBox1
             // 
@@ -534,6 +546,7 @@ namespace VideoSurveilance
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(560, 20);
             this.textBox1.TabIndex = 3;
+            this.textBox1.Visible = false;
             // 
             // imageBox2
             // 
@@ -566,6 +579,7 @@ namespace VideoSurveilance
             this.chkOnlyBox.TabIndex = 8;
             this.chkOnlyBox.Text = "Draw Box Only For This";
             this.chkOnlyBox.UseVisualStyleBackColor = true;
+            this.chkOnlyBox.Visible = false;
             // 
             // cmdTrackOk
             // 
@@ -575,6 +589,7 @@ namespace VideoSurveilance
             this.cmdTrackOk.TabIndex = 7;
             this.cmdTrackOk.Text = "Ok";
             this.cmdTrackOk.UseVisualStyleBackColor = true;
+            this.cmdTrackOk.Visible = false;
             this.cmdTrackOk.Click += new System.EventHandler(this.cmdTrackOk_Click);
             // 
             // label3
@@ -585,6 +600,7 @@ namespace VideoSurveilance
             this.label3.Size = new System.Drawing.Size(50, 13);
             this.label3.TabIndex = 6;
             this.label3.Text = "Track Id:";
+            this.label3.Visible = false;
             // 
             // txtId
             // 
@@ -592,6 +608,7 @@ namespace VideoSurveilance
             this.txtId.Name = "txtId";
             this.txtId.Size = new System.Drawing.Size(59, 20);
             this.txtId.TabIndex = 5;
+            this.txtId.Visible = false;
             // 
             // label2
             // 
@@ -601,6 +618,16 @@ namespace VideoSurveilance
             this.label2.Size = new System.Drawing.Size(84, 13);
             this.label2.TabIndex = 0;
             this.label2.Text = "Forground Mask";
+            this.label2.Visible = false;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(12, 106);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(92, 13);
+            this.label4.TabIndex = 27;
+            this.label4.Text = "3) Annotate Video";
             // 
             // VideoSurveilance
             // 
@@ -675,5 +702,6 @@ namespace VideoSurveilance
         private Label label5;
         private TextBox eventName2;
         private Label eventName;
+        private Label label4;
     }
 }

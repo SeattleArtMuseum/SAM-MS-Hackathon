@@ -462,8 +462,6 @@ namespace VideoSurveilance
         {
             if (this.IsCaptureHeight)
             {
-                this.messaging.Text = "People who cross this line will be counted.  If this is correct, press continue.  Otherwise click again.";
-                this.messaging.Refresh();
 
                 Mat drawFrame = _cameraCapture.QueryFrame();
 
@@ -529,7 +527,8 @@ namespace VideoSurveilance
             Mat frame = _cameraCapture.QueryFrame();
             imageBox1.Image = frame;
             IsCaptureHeight = true;
-            this.messaging.Text = "Next we'll define the entrance to the park.  Click on the image twice.  Once on the left side of the entrance, and next on the right side";
+            this.messaging.Text = "Next we'll define the entrance to the park.  Click on the image twice.  Once on the left side of the entrance, and next on the right side.  People who cross this line will be counted.  If this is correct, press continue.  Otherwise click again.";
+            this.messaging.Show();
             this.messaging.Refresh();
             imageBox1.Refresh();
         }
@@ -962,9 +961,6 @@ namespace VideoSurveilance
                 this.FileLocation = browseFileDialog.FileName;
                 this.fileNameTextBox.Text = browseFileDialog.FileName;
 
-                this.lblSkipToFrame.Visible = true;
-                this.txtSkipToFrame.Visible = true;
-                this.cmdSkipToFrame.Visible = true;
             }
         }
 
