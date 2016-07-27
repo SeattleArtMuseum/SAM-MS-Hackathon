@@ -32,6 +32,7 @@ namespace VideoSurveilance
       {
             this.components = new System.ComponentModel.Container();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.animation = new System.Windows.Forms.PictureBox();
             this.imageBox1 = new Emgu.CV.UI.ImageBox();
             this.panel1 = new System.Windows.Forms.Panel();
             this.eventName2 = new System.Windows.Forms.TextBox();
@@ -40,6 +41,8 @@ namespace VideoSurveilance
             this.fileNameTextBox = new System.Windows.Forms.TextBox();
             this.cmdStartVideo = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
+            this.cmdPlayVideo = new System.Windows.Forms.Button();
+            this.cmdVideo = new System.Windows.Forms.Button();
             this.cmdStopFrame = new System.Windows.Forms.Button();
             this.txtStopFrame = new System.Windows.Forms.TextBox();
             this.cmdCompare = new System.Windows.Forms.Button();
@@ -79,10 +82,15 @@ namespace VideoSurveilance
             this.label3 = new System.Windows.Forms.Label();
             this.txtId = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
+            this.lstVideoOutput = new System.Windows.Forms.ListBox();
+            this.cmdPlayVideoFromOutput = new System.Windows.Forms.Button();
+            this.txtPeopleCount1 = new System.Windows.Forms.TextBox();
+            this.txtPeopleCount2 = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.animation)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox1)).BeginInit();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox2)).BeginInit();
@@ -97,11 +105,18 @@ namespace VideoSurveilance
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.Controls.Add(this.animation);
             this.splitContainer1.Panel1.Controls.Add(this.imageBox1);
             this.splitContainer1.Panel1.Controls.Add(this.panel1);
             // 
             // splitContainer1.Panel2
             // 
+            this.splitContainer1.Panel2.Controls.Add(this.txtPeopleCount2);
+            this.splitContainer1.Panel2.Controls.Add(this.txtPeopleCount1);
+            this.splitContainer1.Panel2.Controls.Add(this.cmdPlayVideoFromOutput);
+            this.splitContainer1.Panel2.Controls.Add(this.lstVideoOutput);
+            this.splitContainer1.Panel2.Controls.Add(this.cmdPlayVideo);
+            this.splitContainer1.Panel2.Controls.Add(this.cmdVideo);
             this.splitContainer1.Panel2.Controls.Add(this.cmdStopFrame);
             this.splitContainer1.Panel2.Controls.Add(this.txtStopFrame);
             this.splitContainer1.Panel2.Controls.Add(this.cmdCompare);
@@ -136,18 +151,28 @@ namespace VideoSurveilance
             this.splitContainer1.Panel2.Controls.Add(this.textBox1);
             this.splitContainer1.Panel2.Controls.Add(this.imageBox2);
             this.splitContainer1.Panel2.Controls.Add(this.panel2);
-            this.splitContainer1.Size = new System.Drawing.Size(1120, 552);
+            this.splitContainer1.Size = new System.Drawing.Size(1120, 591);
             this.splitContainer1.SplitterDistance = 551;
             this.splitContainer1.TabIndex = 0;
+            // 
+            // animation
+            // 
+            this.animation.Location = new System.Drawing.Point(12, 118);
+            this.animation.Name = "animation";
+            this.animation.Size = new System.Drawing.Size(263, 214);
+            this.animation.TabIndex = 3;
+            this.animation.TabStop = false;
+            this.animation.Visible = false;
             // 
             // imageBox1
             // 
             this.imageBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.imageBox1.Location = new System.Drawing.Point(0, 103);
             this.imageBox1.Name = "imageBox1";
-            this.imageBox1.Size = new System.Drawing.Size(551, 449);
+            this.imageBox1.Size = new System.Drawing.Size(551, 488);
             this.imageBox1.TabIndex = 2;
             this.imageBox1.TabStop = false;
+            this.imageBox1.Click += new System.EventHandler(this.imageBox1_Click);
             this.imageBox1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.imageBox1_MouseClick);
             this.imageBox1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.imageBox1_MouseMove);
             // 
@@ -171,6 +196,8 @@ namespace VideoSurveilance
             this.eventName2.Name = "eventName2";
             this.eventName2.Size = new System.Drawing.Size(149, 20);
             this.eventName2.TabIndex = 26;
+            this.eventName2.Text = "SAM Event";
+            this.eventName2.TextChanged += new System.EventHandler(this.eventName2_TextChanged);
             // 
             // eventName
             // 
@@ -216,6 +243,28 @@ namespace VideoSurveilance
             this.label1.TabIndex = 0;
             this.label1.Text = "Video File";
             // 
+            // cmdPlayVideo
+            // 
+            this.cmdPlayVideo.Location = new System.Drawing.Point(465, 364);
+            this.cmdPlayVideo.Name = "cmdPlayVideo";
+            this.cmdPlayVideo.Size = new System.Drawing.Size(78, 30);
+            this.cmdPlayVideo.TabIndex = 35;
+            this.cmdPlayVideo.Text = "Play Video";
+            this.cmdPlayVideo.UseVisualStyleBackColor = true;
+            this.cmdPlayVideo.Visible = false;
+            this.cmdPlayVideo.Click += new System.EventHandler(this.cmdPlayVideo_Click);
+            // 
+            // cmdVideo
+            // 
+            this.cmdVideo.Location = new System.Drawing.Point(381, 364);
+            this.cmdVideo.Name = "cmdVideo";
+            this.cmdVideo.Size = new System.Drawing.Size(78, 30);
+            this.cmdVideo.TabIndex = 34;
+            this.cmdVideo.Text = "Prep Video";
+            this.cmdVideo.UseVisualStyleBackColor = true;
+            this.cmdVideo.Visible = false;
+            this.cmdVideo.Click += new System.EventHandler(this.cmdVideo_Click);
+            // 
             // cmdStopFrame
             // 
             this.cmdStopFrame.Location = new System.Drawing.Point(505, 111);
@@ -235,6 +284,7 @@ namespace VideoSurveilance
             // 
             // cmdCompare
             // 
+            this.cmdCompare.Enabled = false;
             this.cmdCompare.Location = new System.Drawing.Point(453, 400);
             this.cmdCompare.Name = "cmdCompare";
             this.cmdCompare.Size = new System.Drawing.Size(109, 30);
@@ -339,7 +389,7 @@ namespace VideoSurveilance
             // 
             // cmdCopyItems
             // 
-            this.cmdCopyItems.Location = new System.Drawing.Point(430, 364);
+            this.cmdCopyItems.Location = new System.Drawing.Point(239, 364);
             this.cmdCopyItems.Name = "cmdCopyItems";
             this.cmdCopyItems.Size = new System.Drawing.Size(63, 30);
             this.cmdCopyItems.TabIndex = 23;
@@ -361,7 +411,7 @@ namespace VideoSurveilance
             // 
             // cmdHighlight
             // 
-            this.cmdHighlight.Location = new System.Drawing.Point(499, 364);
+            this.cmdHighlight.Location = new System.Drawing.Point(308, 364);
             this.cmdHighlight.Name = "cmdHighlight";
             this.cmdHighlight.Size = new System.Drawing.Size(63, 30);
             this.cmdHighlight.TabIndex = 21;
@@ -498,7 +548,7 @@ namespace VideoSurveilance
             // 
             // cmdCopy
             // 
-            this.cmdCopy.Location = new System.Drawing.Point(3, 420);
+            this.cmdCopy.Location = new System.Drawing.Point(6, 504);
             this.cmdCopy.Name = "cmdCopy";
             this.cmdCopy.Size = new System.Drawing.Size(54, 30);
             this.cmdCopy.TabIndex = 8;
@@ -508,10 +558,10 @@ namespace VideoSurveilance
             // 
             // txtTrackOutput
             // 
-            this.txtTrackOutput.Location = new System.Drawing.Point(6, 456);
+            this.txtTrackOutput.Location = new System.Drawing.Point(6, 540);
             this.txtTrackOutput.Multiline = true;
             this.txtTrackOutput.Name = "txtTrackOutput";
-            this.txtTrackOutput.Size = new System.Drawing.Size(560, 93);
+            this.txtTrackOutput.Size = new System.Drawing.Size(560, 48);
             this.txtTrackOutput.TabIndex = 6;
             // 
             // txtIdDetails
@@ -540,7 +590,7 @@ namespace VideoSurveilance
             this.imageBox2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.imageBox2.Location = new System.Drawing.Point(0, 48);
             this.imageBox2.Name = "imageBox2";
-            this.imageBox2.Size = new System.Drawing.Size(565, 504);
+            this.imageBox2.Size = new System.Drawing.Size(565, 543);
             this.imageBox2.TabIndex = 2;
             this.imageBox2.TabStop = false;
             // 
@@ -602,11 +652,49 @@ namespace VideoSurveilance
             this.label2.TabIndex = 0;
             this.label2.Text = "Forground Mask";
             // 
+            // lstVideoOutput
+            // 
+            this.lstVideoOutput.FormattingEnabled = true;
+            this.lstVideoOutput.Location = new System.Drawing.Point(3, 436);
+            this.lstVideoOutput.Name = "lstVideoOutput";
+            this.lstVideoOutput.ScrollAlwaysVisible = true;
+            this.lstVideoOutput.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
+            this.lstVideoOutput.Size = new System.Drawing.Size(556, 56);
+            this.lstVideoOutput.TabIndex = 36;
+            this.lstVideoOutput.Visible = false;
+            // 
+            // cmdPlayVideoFromOutput
+            // 
+            this.cmdPlayVideoFromOutput.Location = new System.Drawing.Point(484, 498);
+            this.cmdPlayVideoFromOutput.Name = "cmdPlayVideoFromOutput";
+            this.cmdPlayVideoFromOutput.Size = new System.Drawing.Size(78, 30);
+            this.cmdPlayVideoFromOutput.TabIndex = 37;
+            this.cmdPlayVideoFromOutput.Text = "Play Video";
+            this.cmdPlayVideoFromOutput.UseVisualStyleBackColor = true;
+            this.cmdPlayVideoFromOutput.Visible = false;
+            this.cmdPlayVideoFromOutput.Click += new System.EventHandler(this.cmdPlayVideoFromOutput_Click);
+            // 
+            // txtPeopleCount1
+            // 
+            this.txtPeopleCount1.Location = new System.Drawing.Point(225, 406);
+            this.txtPeopleCount1.Name = "txtPeopleCount1";
+            this.txtPeopleCount1.Size = new System.Drawing.Size(43, 20);
+            this.txtPeopleCount1.TabIndex = 38;
+            this.txtPeopleCount1.Text = "900";
+            // 
+            // txtPeopleCount2
+            // 
+            this.txtPeopleCount2.Location = new System.Drawing.Point(278, 406);
+            this.txtPeopleCount2.Name = "txtPeopleCount2";
+            this.txtPeopleCount2.Size = new System.Drawing.Size(43, 20);
+            this.txtPeopleCount2.TabIndex = 39;
+            this.txtPeopleCount2.Text = "8000";
+            // 
             // VideoSurveilance
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1120, 552);
+            this.ClientSize = new System.Drawing.Size(1120, 591);
             this.Controls.Add(this.splitContainer1);
             this.Name = "VideoSurveilance";
             this.Text = "VideoSurveilance";
@@ -615,6 +703,7 @@ namespace VideoSurveilance
             this.splitContainer1.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.animation)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox1)).EndInit();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
@@ -675,5 +764,12 @@ namespace VideoSurveilance
         private Label label5;
         private TextBox eventName2;
         private Label eventName;
+        private Button cmdVideo;
+        private Button cmdPlayVideo;
+        private PictureBox animation;
+        private Button cmdPlayVideoFromOutput;
+        private ListBox lstVideoOutput;
+        private TextBox txtPeopleCount2;
+        private TextBox txtPeopleCount1;
     }
 }
