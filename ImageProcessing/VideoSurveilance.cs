@@ -67,6 +67,8 @@ namespace VideoSurveilance
         private List<int> highlightedHumanBlobs = new List<int>();
         private List<int> highlightedMachineBlobs = new List<int>();
 
+        private EventTable eventTable;
+
         private List<Tuple<string, Point, Point>> thresholds;
 
         /// <summary>
@@ -393,9 +395,6 @@ namespace VideoSurveilance
 
         private void OutputResults()
         {
-            EventTable eventTable = new EventTable(Guid.NewGuid(), this.eventName2.Text);
-            tableClient.InsertRecord("Event", eventTable);
-
             retiredblobs.AddRange(movingblobs.Values);
             var validblobs = retiredblobs.Where(b => b.crossedThreshold((Point)this.LeftCoordinate, (Point)this.RightCoordinate) && b.Path.Count > Constants.MinPathCountPoints);
             //!b.IsTooBig());
@@ -638,6 +637,10 @@ namespace VideoSurveilance
                 SaveThresholdsToFile(this.thresholds);
                 this.continueButton.Hide();
                 this.resetButton.Hide();
+
+                eventTable = new EventTable(Guid.NewGuid(), this.eventName2.Text);
+                tableClient.InsertRecord("Event", eventTable);
+
                 Run();
             }
         }
