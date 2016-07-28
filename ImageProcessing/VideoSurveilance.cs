@@ -143,6 +143,9 @@ namespace VideoSurveilance
         int thresholdindex = 0;
         void Run()
         {
+            panel1.Hide();
+            splitContainer1.Panel2.Hide();
+
             _fgDetector = new BackgroundSubtractorMOG2(history: 1000, varThreshold: 64, shadowDetection: true);
             _blobDetector = new CvBlobDetector();
             _tracker = new CvTracks();
@@ -153,6 +156,8 @@ namespace VideoSurveilance
 
             if(thresholdindex < thresholds.Count())
             {
+                progressBar1.Show();
+                progressBar1.Value = (int)(100.0 * thresholdindex / thresholds.Count());
                 imageBox1.Hide();
                 LoadVideoFile(thresholds[thresholdindex].Item1);
                 LeftCoordinate = thresholds[thresholdindex].Item2;
@@ -267,8 +272,7 @@ namespace VideoSurveilance
 
         void ProcessFrame(object sender, EventArgs e)
         {
-
-            label8.Text = "Processing: " + thresholds[thresholdindex - 1].Item1 + " Frame: " + currentFrame;
+            label9.Text = "Processing: " + thresholds[thresholdindex - 1].Item1 + " Frame: " + currentFrame;
             textBox1.Text = Math.Round(CurrentTime() % 60).ToString();
             this.currentFrame++;
             Mat frame = _cameraCapture.QueryFrame();
@@ -530,6 +534,7 @@ namespace VideoSurveilance
                 }
                 if (thresholdindex == thresholds.Count())
                 {
+                    progressBar1.Value = 100;
                     MessageBox.Show("All files processed");
                     Application.Exit();
                 }
@@ -708,7 +713,9 @@ namespace VideoSurveilance
 
                 tableClient.InsertRecord("Event", eventTable);
 
+                messaging.Hide();
                 SkipButton.Hide();
+                progressBar1.Show();
                 label8.Text = "";
                 Run();
             }
@@ -1201,6 +1208,12 @@ namespace VideoSurveilance
         {
             cmdStartVideo_Click(sender, e);
         }
+
+        private void label9_Click(object sender, EventArgs e)
+        {
+
+        }
+
 
         private void HandleTick(object sender, EventArgs e)
         {
