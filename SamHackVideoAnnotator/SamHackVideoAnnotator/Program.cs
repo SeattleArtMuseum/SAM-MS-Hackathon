@@ -16,7 +16,7 @@ namespace SamHackVideoAnnotator
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new SimpleAnnotator());
+            Application.Run(new FrameTracker());
         }
     }
 }

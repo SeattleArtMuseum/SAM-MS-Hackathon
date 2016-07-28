@@ -131,6 +131,11 @@ namespace SamHackVideoAnnotator
                     Person person = new Person();
                     person.Index = this.People.Count;
                     Rectangle crop = new Rectangle(topLeftX, topLeftY, bottomRightX - topLeftX, bottomRightY - topLeftY);
+                    if (crop.Width == 0 || crop.Height == 0)
+                    {
+                        return;
+                    }
+
                     Bitmap bmp = new Bitmap(crop.Width, crop.Height);
                     Graphics g = Graphics.FromImage(bmp);
                     g.DrawImage(picture.Image, 0, 0, crop, GraphicsUnit.Pixel);
