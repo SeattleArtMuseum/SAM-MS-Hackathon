@@ -17,6 +17,8 @@ namespace StorageClient
         {
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(connectionString);
             tableClient = storageAccount.CreateCloudTableClient();
+            CreateTable("Event");
+            CreateTable("Action");
         }
 
         /// <summary>
